@@ -6,16 +6,41 @@ plane = {
         'aspect_ratio': 8,  # []
         'sweep_LE': 5,  # [deg]
         'taper': 0.5,  # []
-        'dihedral': 0,  # [deg]
         'station': 37.5,  # [ft]
         'buttline': 0,  # [ft]
         'waterline': 1,  # [ft]
         'incidence': 0,  # [deg]
+        'dihedral': 0,  # [deg]
         'c_l_alpha': 5,  # [1/rad]
         'alpha_zero_lift': -1,  # [deg]
         'airfoil_thickness': 0.15,  # []
         'airfoil_cm0': 0,  # []
         'alpha_stall': 12,  # [deg]
+        'n_controls': 4,  # []
+        'control_1': {
+            'name': 'aileron_l',
+            'cf_c': 0.15,
+            'b_1': -0.95,
+            'b_2': -0.85,
+        },
+        'control_2': {
+            'name': 'flap_l',
+            'cf_c': 0.2,
+            'b_1': -0.7,
+            'b_2': -0.2,
+        },
+        'control_3': {
+            'name': 'flap_r',
+            'cf_c': 0.2,
+            'b_1': 0.2,
+            'b_2': 0.7,
+        },
+        'control_4': {
+            'name': 'aileron_r',
+            'cf_c': 0.15,
+            'b_1': 0.85,
+            'b_2': 0.95,
+        },
     },
     'horizontal': {
         'type': 'wing',
@@ -23,15 +48,28 @@ plane = {
         'aspect_ratio': 4,  # []
         'sweep_LE': 10,  # [deg]
         'taper': 0.465,  # []
-        'dihedral': 0,  # [deg]
         'station': 85,  # [ft]
         'buttline': 0,  # [ft]
         'waterline': 7,  # [ft]
         'incidence': 0,  # [deg]
+        'dihedral': 0,  # [deg]
         'c_l_alpha': 5,  # [1/rad]
         'alpha_zero_lift': 0,  # [deg]
         'airfoil_thickness': 0.1,  # []
-        'airfoil_cm0': 0  # []
+        'airfoil_cm0': 0,  # []
+        'n_controls': 2,
+        'control_1': {
+            'name': 'elevator_l',
+            'cf_c': 0.3,
+            'b_1': -0.9,
+            'b_2': -0.1,
+        },
+        'control_2': {
+            'name': 'elevator_r',
+            'cf_c': 0.3,
+            'b_1': 0.1,
+            'b_2': 0.9,
+        },
     },
     'vertical': {
         'type': 'vertical',
@@ -44,39 +82,14 @@ plane = {
         'waterline': 8,  # [ft]
         'c_l_alpha': 5,  # [1/rad]
         'alpha_zero_lift': 0,  # [deg]
-        'airfoil_thickness': 0.15  # []
-    },
-    'elevator': {
-        'type': 'control_surface',
-        'parent': 'horizontal',
-        'limits': [-15, 15],  # [deg]
-        'chord_ratio': 0.37,  # []
-        'gain': -1
-    },
-    'aileron_l': {
-        'type': 'control_surface',
-        'parent': 'wing',
-        'chord_ratio': 0.3,
-        'x_2_b': 0.98,
-        'x_1_b': 0.75,
-        'limits': [-15, 15],  # [deg]
-        'gain': 0.5
-    },
-    'aileron_r': {
-        'type': 'control_surface',
-        'parent': 'wing',
-        'chord_ratio': 0.35,
-        'x_2_b': 0.98,
-        'x_1_b': 0.75,
-        'limits': [-15, 15],  # [deg]
-        'gain': 0.5
-    },
-    'rudder': {
-        'type': 'control_surface',
-        'parent': 'vertical',
-        'limits': [-15, 15],  # [deg]
-        'chord_ratio': 0.35,  # []
-        'span_ratio': 1  # []
+        'airfoil_thickness': 0.15,  # []
+        'n_controls': 1,
+        'control_2': {
+            'name': 'rudder',
+            'cf_c': 0.3,
+            'b_1': 0.1,
+            'b_2': 0.9,
+        },
     },
     'fuselage': {
         'length': 90,  # [ft]
@@ -176,18 +189,4 @@ plane = {
         'mu_brake': 0.1,
         'c_d': 0.01
     },
-    'control_law': {
-        'pitch': {
-            'damping_gain': 0,
-            'stiffness_gain': 0
-        },
-        'roll': {
-            'damping_gain': -0.5,
-            'stiffness_gain': 0
-        },
-        'yaw': {
-            'damping_gain': 0.5,
-            'stiffness_gain': -0.005
-        }
-    }
 }

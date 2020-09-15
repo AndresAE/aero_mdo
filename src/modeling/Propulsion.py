@@ -1,26 +1,33 @@
-from common.atmosphere import air_density
+from src.common import Atmosphere
 from numpy import array, cos as c, cross, deg2rad, sin as s, sum, zeros
 from scipy.interpolate import RectBivariateSpline
 
 
-def thrust_f_m(aircraft, x, throttle):
-    """returns total propulsion forces and moments."""
-    cg = aircraft['weight']['cg']
-    c_f_m = zeros((aircraft['propulsion']['n_engines'], 6))
-    for ii in range(0, aircraft['propulsion']['n_engines']):
-        engine = aircraft['propulsion']["engine_%d" % (ii + 1)]
-        if engine['type'] == 'jet':
-            c_f_m[ii, :] = jet_engine(engine, cg, x[-1], throttle[ii])
-        elif engine['type'] == 'prop':
-            c_f_m[ii, :] = propeller(engine, cg, x[0], throttle[ii])
-    c_f_m = sum(c_f_m, axis=0)
-    return c_f_m
+class Propulsion:
+    def __init__(self, propulsion, x, throttle, cg):
+        self.propulsion = propulsion
+        self.x = x
+        self.throttle = throttle
+        self.cg = cg
+
+    def thrust_f_m(self):
+        """returns total propulsion forces and moments."""
+        c_f_m = zeros((self.propulsion['n_engines'], 6))
+        for ii in range(0, self.propulsion['n_engines']):
+            engine = self.propulsion["engine_%d" % (ii + 1)]
+            if engine['type'] == 'jet':
+                c_f_m[ii, :] = jet_engine(engine, self.cg, self.x[-1], self.throttle[ii])
+            elif engine['type'] == 'prop':
+                c_f_m[ii, :] = propeller(engine, self.cg, self.x[0], self.throttle[ii])
+        c_f_m = sum(c_f_m, axis=0)
+        return c_f_m
 
 
+# Public Methods #######################################################################################################
 def jet_engine(engine, cg, altitude, throttle):
     """returns jet engine forces and moments."""
-    rho = air_density(altitude)
-    rho_sl = air_density(0)
+    rho = Atmosphere(altitude).air_density()
+    rho_sl = Atmosphere(0).air_density()
     t_slo = engine['thrust']*throttle
     phi = deg2rad(engine['thrust_angle'])
     psi = deg2rad(engine['toe_angle'])
@@ -45,7 +52,7 @@ def propeller(engine, cg, v, throttle):
     j = array([v/(engine['diameter'] * rpm)])
     f = RectBivariateSpline(pitch_c_t, j_c_t, c_t, kx=1)
     c_t_i = f(engine['pitch'], j)
-    rho = air_density(0)
+    rho = Atmosphere(0).air_density()
     t = float(rho * (rpm ** 2) * (engine['diameter'] ** 4) * c_t_i)
     phi = deg2rad(engine['thrust_angle'])
     psi = deg2rad(engine['toe_angle'])
