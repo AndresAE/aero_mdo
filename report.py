@@ -1,11 +1,10 @@
 from src.airplanes.plane_1 import plane as aircraft
-from src.modeling.flap import c_f_m_flap
+from src.modeling.force_model import c_f_m
+from numpy import array
 
-cg = aircraft['weight']['cg']
-w = aircraft['wing']
-c = aircraft['wing']['control_4']
-m = 0.3
-c = c_f_m_flap(w, c, m, cg)
-print(c)
+x = array([float(200), 0, float(10), 0, float(5/57.3), 0, 0, 0, 0, 0, 0, float(5000)])
+throttle = array([1, 1, 1, 1, 1, 1]) * 1
+cfm = c_f_m(aircraft, x, [0, -6.6/57.3, 0], throttle)
+print(cfm)
 
 

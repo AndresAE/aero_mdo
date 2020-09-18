@@ -1,6 +1,6 @@
 # File containing Equations of Motion
 from numpy import concatenate, cross, dot, linalg, transpose
-from src.common.Rotations import angular_rate_rotation, ned_to_body
+from src.common.rotations import angular_rate_rotation, ned_to_body
 
 
 def local_acceleration(p, cg, x, dxdt):

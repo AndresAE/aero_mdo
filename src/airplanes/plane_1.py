@@ -84,7 +84,7 @@ plane = {
         'alpha_zero_lift': 0,  # [deg]
         'airfoil_thickness': 0.15,  # []
         'n_controls': 1,
-        'control_2': {
+        'control_1': {
             'name': 'rudder',
             'cf_c': 0.3,
             'b_1': 0.1,
@@ -104,7 +104,7 @@ plane = {
     'weight': {
         'weight': 41316.6,  # [lb]
         'inertia': [[160937, 0, 30000], [0, 234038, 0], [30000, 0, 348056]],  # [slug*ft^2]
-        'cg': [43, 0, 2]  # [ft]
+        'cg': [40, 0, 2]  # [ft]
     },
     'propulsion': {
         'n_engines': 6,

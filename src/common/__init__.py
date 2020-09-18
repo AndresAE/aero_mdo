@@ -1,3 +1,3 @@
 from .Atmoshpere import Atmosphere
 from .Earth import Earth
-from . import Rotations
+from . import rotations

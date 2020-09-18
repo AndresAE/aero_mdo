@@ -2,3 +2,5 @@ build*
 dist*
 src.egg*
 .idea*
+src/modeling/__pycache__/*
+*.pyc
