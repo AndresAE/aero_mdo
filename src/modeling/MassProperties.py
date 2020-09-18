@@ -8,6 +8,7 @@ class LiftingSurface:
         self.aircraft = aircraft
 
     def weight(self):
+        """return empirical aircraft weight estimate."""
         s_w = self.aircraft['wing']['planform']
         pax = self.aircraft['fuselage']['pax']
         w_s = 117.8 * s_w - 24298
@@ -16,18 +17,21 @@ class LiftingSurface:
         return w
 
     def i_xx(self):
+        """return empirical aircraft x axis inertia estimate."""
         w = self.aircraft['weight']['weight']
         b = span(self.aircraft['wing']['aspect_ratio'], self.aircraft['wing']['planform'])
         i = (w / g) * (0.3 * b / 2) ** 2
         return i
 
     def i_yy(self):
+        """return empirical aircraft y axis inertia estimate."""
         w = self.aircraft['weight']['weight']
         d = self.aircraft['fuselage']['length']
         i = (w / g) * (0.3 * d / 2) ** 2
         return i
 
     def i_zz(self):
+        """return empirical aircraft z axis inertia estimate."""
         w = self.aircraft['weight']['weight']
         b = span(self.aircraft['wing']['aspect_ratio'], self.aircraft['wing']['planform'])
         d = self.aircraft['fuselage']['length']
@@ -36,5 +40,6 @@ class LiftingSurface:
         return i
 
     def i_xz(self):
+        """return empirical aircraft xz axis inertia estimate."""
         i_xz = 0 * self.aircraft['weight']['weight']
         return i_xz
