@@ -61,14 +61,14 @@ plane = {
         'control_1': {
             'name': 'elevator_l',
             'cf_c': 0.3,
-            'b_1': -0.9,
+            'b_1': -0.95,
             'b_2': -0.1,
         },
         'control_2': {
             'name': 'elevator_r',
             'cf_c': 0.3,
             'b_1': 0.1,
-            'b_2': 0.9,
+            'b_2': 0.95,
         },
     },
     'vertical': {
@@ -182,7 +182,7 @@ plane = {
         'nose': [15, 0, -4],  # [ft]
         'nose_diameter': 1,  # [ft]
         'nose_width': 0.5,  # [ft]
-        'main': [49, 12, -4],  # [ft]
+        'main': [41, 12, -4],  # [ft]
         'main_diameter': 1.5,  # [ft]
         'main_width': 1.5,  # [ft]
         'mu_roll': 0.02,

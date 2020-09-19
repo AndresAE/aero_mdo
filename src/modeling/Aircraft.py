@@ -27,6 +27,7 @@ class Aircraft:
         s_ht = ht['planform']  # [ft^2]
         s_vt = vt['planform']  # [ft^2]
         s_w = wing['planform']  # [ft^2]
+        self.y_mac = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'], mirror=0)
 
         self.downwash = LiftingSurface(wing).d_epsilon_d_alpha(ht, mach)
         self.d_sigma_d_beta_ht = LiftingSurface(wing).d_sigma_d_beta_ht(ht, self.plane['fuselage'])
@@ -223,7 +224,7 @@ class Aircraft:
         s_w = wing['planform']  # [ft^2]
         vt = self.plane['vertical']
         s_v = vt['planform']
-        z_vt = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'])
+        z_vt = self.y_mac
         x_vt = x_mac(z_vt, vt['sweep_LE'])
         z_v = vt['waterline'] + z_vt - self.plane['weight']['cg'][2]
         x_v = vt['station'] + x_vt - self.plane['weight']['cg'][0]
@@ -238,7 +239,7 @@ class Aircraft:
         s_w = wing['planform']  # [ft^2]
         vt = self.plane['vertical']
         s_v = vt['planform']
-        z_vt = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'])
+        z_vt = self.y_mac
         x_vt = x_mac(z_vt, vt['sweep_LE'])
         z_v = vt['waterline'] + z_vt - self.plane['weight']['cg'][2]
         x_v = vt['station'] + x_vt - self.plane['weight']['cg'][0]
@@ -267,7 +268,7 @@ class Aircraft:
         b_h = span(ht['aspect_ratio'], s_h)
         taper = wing['taper']
         taper_h = ht['taper']
-        z_vt = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'])
+        z_vt = self.y_mac
         x_vt = x_mac(z_vt, vt['sweep_LE'])
         z_v = vt['waterline'] + z_vt - self.plane['weight']['cg'][2]
         x_v = vt['station'] + x_vt - self.plane['weight']['cg'][0]
@@ -298,7 +299,7 @@ class Aircraft:
         b_h = span(ht['aspect_ratio'], s_h)
         taper = wing['taper']
         taper_h = ht['taper']
-        z_vt = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'])
+        z_vt = self.y_mac
         z_v = vt['waterline'] + z_vt - self.plane['weight']['cg'][2]
         c_r_p_w = -self.c_l_alpha_w*(1+3*taper)/(12*(1+taper))
         c_r_p_h = -self.c_l_alpha_ht*(1+3*taper_h)/(12*(1+taper_h))*s_h/s_w*(b_h/b)**2
@@ -317,7 +318,7 @@ class Aircraft:
         taper = wing['taper']
         c_r_r_w = self.c_l_alpha_w*alpha*(1+3*taper)/(6*(1+taper))
         c_y_b_vt = -k_yv * abs(self.c_l_alpha_vt) * (self.d_sigma_d_beta_vt * s_v / s_w)
-        z_vt = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'])
+        z_vt = self.y_mac
         x_vt = x_mac(z_vt, vt['sweep_LE'])
         z_v = vt['waterline'] + z_vt - self.plane['weight']['cg'][2]
         x_v = vt['station'] + x_vt - self.plane['weight']['cg'][0]
@@ -351,7 +352,7 @@ class Aircraft:
         z_w = wing['waterline'] - self.plane['weight']['cg'][2]
         x_h = ht['station'] + x_h - self.plane['weight']['cg'][0]
         z_h = ht['waterline'] - self.plane['weight']['cg'][2]
-        z_vt = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'])
+        z_vt = self.y_mac
         x_vt = x_mac(z_vt, vt['sweep_LE'])
         z_v = vt['waterline'] + z_vt - self.plane['weight']['cg'][2]
         x_v = vt['station'] + x_vt - self.plane['weight']['cg'][0]
@@ -376,7 +377,7 @@ class Aircraft:
         vt = self.plane['vertical']
         s_v = vt['planform']
         c_y_b_vt = -k_yv * abs(self.c_l_alpha_vt) * (self.d_sigma_d_beta_vt * s_v / s_w)
-        z_vt = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'])
+        z_vt = self.y_mac
         x_vt = x_mac(z_vt, vt['sweep_LE'])
         z_v = vt['waterline'] + z_vt - self.plane['weight']['cg'][2]
         x_v = vt['station'] + x_vt - self.plane['weight']['cg'][0]
@@ -394,7 +395,7 @@ class Aircraft:
         vt = self.plane['vertical']
         s_v = vt['planform']
         c_y_b_vt = -k_yv * abs(self.c_l_alpha_vt) * (self.d_sigma_d_beta_vt * s_v / s_w)
-        z_vt = y_mac(vt['aspect_ratio'], vt['planform'], vt['taper'])
+        z_vt = self.y_mac
         x_vt = x_mac(z_vt, vt['sweep_LE'])
         z_v = vt['waterline'] + z_vt - self.plane['weight']['cg'][2]
         x_v = vt['station'] + x_vt - self.plane['weight']['cg'][0]

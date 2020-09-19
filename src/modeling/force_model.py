@@ -3,10 +3,10 @@ from src.modeling.aerodynamics import dynamic_pressure
 from src.common import Atmosphere
 from src.modeling import Aircraft, Propulsion
 from src.modeling.trapezoidal_wing import mac, span
-from numpy import array, arctan, cos, linalg, sin, sqrt
+from numpy import array, arctan, cos, linalg, sin, sqrt, ones
 
 
-def c_f_m(aircraft, x, u, throttle):
+def c_f_m(aircraft, x, u):
     """return aircraft body axis forces and moments."""
     s = aircraft['wing']['planform']  # [ft2]
     altitude = x[-1]  # [ft]
@@ -29,6 +29,7 @@ def c_f_m(aircraft, x, u, throttle):
     d_aileron = u[0]  # [rad]
     d_elevator = u[1]  # [rad]
     d_rudder = u[2]  # [rad]
+    throttle = u[3] * ones(aircraft['propulsion']['n_engines'])  # []
 
     # get thrust contributions
     c_f_m_t = Propulsion(aircraft['propulsion'], x, throttle, aircraft['weight']['cg']) .thrust_f_m()

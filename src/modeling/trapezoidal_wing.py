@@ -2,23 +2,35 @@
 from numpy import arctan, deg2rad, rad2deg, sqrt, tan
 
 
-def mac(ar, s, taper):
+def mac(ar, s, taper, mirror=1):
     """returns mean aerodynamic chord length."""
-    c_r = root_chord(ar, s, taper)  # [ft]
+    if mirror == 1:
+        scalar = 1
+    else:
+        scalar = 2
+    c_r = root_chord(ar, s * scalar, taper)  # [ft]
     mean_chord = 2 / 3 * c_r * (1 + taper + taper**2) / (1+taper)  # [ft]
     return mean_chord
 
 
-def root_chord(ar, s, taper):
+def root_chord(ar, s, taper, mirror=1):
     """returns rectangular wing root chord."""
-    b = span(ar, s)  # [ft]
-    chord = 2 * s / (b * (1 + taper))  # [ft]
+    if mirror == 1:
+        scalar = 1
+    else:
+        scalar = 2
+    b = span(ar, s * scalar)  # [ft]
+    chord = 2 * s * scalar / (b * (1 + taper))  # [ft]
     return chord
 
 
-def span(ar, s):
+def span(ar, s, mirror=1):
     """returns rectangular wing span."""
-    b = sqrt(ar * s)  # [ft]
+    if mirror == 1:
+        scalar = 1
+    else:
+        scalar = 2
+    b = sqrt(ar * s * scalar)  # [ft]
     return b
 
 
@@ -40,8 +52,12 @@ def y_chord(y, c_r, b, taper):
     return c
 
 
-def y_mac(ar, s, taper):
+def y_mac(ar, s, taper, mirror=1):
     """return mean aerodynamic chord y buttline."""
-    b = span(ar, s)  # [ft]
+    if mirror == 1:
+        scalar = 1
+    else:
+        scalar = 2
+    b = span(ar, s * scalar)  # [ft]
     y = b/6*(1+2*taper)/(1+taper)  # [ft]
     return y
