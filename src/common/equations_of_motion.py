@@ -2,8 +2,6 @@
 from numpy import concatenate, cross, dot, identity, linalg, transpose, zeros
 from src.common.rotations import angular_rate_rotation, ned_to_body
 from src.modeling.force_model import c_f_m
-dx = 0.01
-du = 0.01
 
 
 def local_acceleration(p, cg, x, dxdt):
@@ -45,7 +43,7 @@ def nonlinear_eom(x, m, j, c):
     return dx_dt
 
 
-def nonlinear_eom_to_ss(aircraft, x_ss, u_ss, x_0, u_0, m, j):
+def nonlinear_eom_to_ss(aircraft, x_ss, u_ss, x_0, u_0, m, j, dx=0.1, du=0.1):
     """aircraft system linearization routine"""
     x = x_0
     u = u_0

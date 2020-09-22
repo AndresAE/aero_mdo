@@ -7,3 +7,5 @@ src/modeling/__pycache__/*
 *.aux
 *.log
 *.gz
+*.toc
+scratch.*

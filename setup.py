@@ -166,6 +166,11 @@ def import_tests():
     except ImportError:
         raise ImportError('matplotlib is required for this package')
 
+    try:
+        import control
+    except ImportError:
+        raise ImportError('control is required for this package')
+
     return
 
 

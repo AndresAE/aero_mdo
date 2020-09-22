@@ -3,24 +3,6 @@ from src.modeling.LiftingSurface import LiftingSurface
 from src.modeling.trapezoidal_wing import mac, root_chord, span, y_chord, y_mac
 
 
-def flap_area(wing, control):
-    """return flapped area."""
-    s = wing['planform']
-    b = span(wing['aspect_ratio'], s)
-    taper = wing['taper']
-    c_r = root_chord(wing['aspect_ratio'], s, taper)
-    s_a = ((control['b_2'] - control['b_1']) * b / 4 *
-           (y_chord(abs(control['b_2']) * b / 2, c_r, b, taper) + y_chord(abs(control['b_1']) * b / 2, c_r, b, taper)))
-    return s_a
-
-
-def flap_span(wing, control):
-    """return flap span."""
-    b = span(wing['aspect_ratio'], wing['planform'])
-    b_f = (control['b_2'] - control['b_1']) * b / 2
-    return b_f
-
-
 def c_f_delta_flap(wing, control, mach):
     """return flap force coefficient derivatives."""
     s = wing['planform']
@@ -37,7 +19,6 @@ def c_f_m_flap(wing, control, mach, cg):
     s = wing['planform']
     b = span(wing['aspect_ratio'], s)
     taper = wing['taper']
-    cbar = mac(wing['aspect_ratio'], wing['planform'], wing['taper'])
     c_r = root_chord(wing['aspect_ratio'], s, taper)
     if y_scalar > 0:
         y_w = b * control['b_2'] / 2
@@ -62,3 +43,21 @@ def c_f_m_flap(wing, control, mach, cg):
     m = cross(r, f)
     c = concatenate((f, m))
     return c
+
+
+def flap_area(wing, control):
+    """return flapped area."""
+    s = wing['planform']
+    b = span(wing['aspect_ratio'], s)
+    taper = wing['taper']
+    c_r = root_chord(wing['aspect_ratio'], s, taper)
+    s_a = ((control['b_2'] - control['b_1']) * b / 4 *
+           (y_chord(abs(control['b_2']) * b / 2, c_r, b, taper) + y_chord(abs(control['b_1']) * b / 2, c_r, b, taper)))
+    return s_a
+
+
+def flap_span(wing, control):
+    """return flap span."""
+    b = span(wing['aspect_ratio'], wing['planform'])
+    b_f = (control['b_2'] - control['b_1']) * b / 2
+    return b_f

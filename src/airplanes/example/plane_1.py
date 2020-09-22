@@ -61,19 +61,19 @@ plane = {
         'control_1': {
             'name': 'elevator_l',
             'cf_c': 0.3,
-            'b_1': -0.95,
-            'b_2': -0.1,
+            'b_1': -0.999,
+            'b_2': -0.01,
         },
         'control_2': {
             'name': 'elevator_r',
             'cf_c': 0.3,
-            'b_1': 0.1,
-            'b_2': 0.95,
+            'b_1': 0.01,
+            'b_2': 0.999,
         },
     },
     'vertical': {
         'type': 'vertical',
-        'planform': 100,  # [ft^2]
+        'planform': 50,  # [ft^2]
         'aspect_ratio': 2,  # []
         'sweep_LE': 20,  # [deg]
         'taper': 0.5,  # []
@@ -102,9 +102,9 @@ plane = {
         'pax': 20
     },
     'weight': {
-        'weight': 41316.6,  # [lb]
-        'inertia': [[160937, 0, 30000], [0, 234038, 0], [30000, 0, 348056]],  # [slug*ft^2]
-        'cg': [40, 0, 2]  # [ft]
+        'weight': 39000,  # [lb]
+        'inertia': [[141933, 0, 30000], [0, 221088, 0], [30000, 0, 318803]],  # [slug*ft^2]
+        'cg': [44.5, 0, 3]  # [ft]
     },
     'propulsion': {
         'n_engines': 6,
@@ -182,11 +182,30 @@ plane = {
         'nose': [15, 0, -4],  # [ft]
         'nose_diameter': 1,  # [ft]
         'nose_width': 0.5,  # [ft]
-        'main': [41, 12, -4],  # [ft]
+        'main': [46, 12, -4],  # [ft], left (mirrored on the right)
         'main_diameter': 1.5,  # [ft]
         'main_width': 1.5,  # [ft]
         'mu_roll': 0.02,
         'mu_brake': 0.1,
         'c_d': 0.01
     },
+}
+requirements = {
+    'loads': {
+        'n_z': [-1, 2.5],  # [g]
+    },
+    'performance': {
+        'bfl': 5000,  # [ft]
+        'cruise_speed': 350,  # [ft/s]
+        'cruise_altitude': 25000,  # [ft]
+        'range': 500,  # [nm]
+    },
+    'stability_and_control': {
+        'c_n_b': 0.05,  # [1/deg]
+        'sm': 0.03,  # [% mac]
+        'zeta_dr': 0.4,
+        'zeta_sp': 0.4,
+        'time_to_roll': 1.5,  # [seconds] to 30 deg of roll
+        'rotation_margin': 1,  # []
+    }
 }

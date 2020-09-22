@@ -3,7 +3,7 @@ from src.modeling.trapezoidal_wing import span
 g = Earth(0).gravity()  # [f/s2]
 
 
-class LiftingSurface:
+class MassProperties:
     def __init__(self, aircraft):
         self.aircraft = aircraft
 

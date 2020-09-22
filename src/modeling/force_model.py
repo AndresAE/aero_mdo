@@ -1,9 +1,9 @@
+from numpy import array, arctan, cos, linalg, ones, sin, sqrt
 from src.common.rotations import body_to_wind
 from src.modeling.aerodynamics import dynamic_pressure
 from src.common import Atmosphere
 from src.modeling import Aircraft, Propulsion
 from src.modeling.trapezoidal_wing import mac, span
-from numpy import array, arctan, cos, linalg, sin, sqrt, ones
 
 
 def c_f_m(aircraft, x, u):

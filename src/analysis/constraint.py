@@ -1,7 +1,7 @@
+from numpy import cos, deg2rad, mean, sin, sqrt
+from src.common import Atmosphere
 from src.common.Earth import Earth
 from src.modeling.Aircraft import Aircraft
-from src.common import Atmosphere
-from numpy import cos, deg2rad, mean, sin, sqrt
 
 
 def master_constraint(aircraft, wing_loading, mach, altitude, n, gamma, a_x):
