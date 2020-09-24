@@ -10,6 +10,12 @@ from src.analysis.trim import trim_aileron, trim_aileron_rudder, trim_alpha_de
 import os
 g = Earth(0).gravity()  # f/s2
 
+# Requirements
+n_z = [-1, 1, 2.5]  # [g]
+crosswind = 15  # [ft/s]
+p = 15  # [deg/s]
+h_to = 5000  # [ft]
+
 
 # Sweep
 def report_sweep(plane, requirements, name=''):
@@ -18,12 +24,6 @@ def report_sweep(plane, requirements, name=''):
     os.mkdir(path)
     machs = array([0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6])
     altitudes = array([0, 5000, 10000, 15000, 20000, 25000, 30000, 35000])
-
-    # Requirements
-    n_z = [requirements['loads']['n_z'][0], 1, requirements['loads']['n_z'][1]]  # [g]
-    crosswind = requirements['stability_and_control']['crosswind']  # [ft/s]
-    p = requirements['stability_and_control']['roll_rate']  # [deg/s]
-    h_to = requirements['performance']['to_altitude']  # [ft]
 
     # set arrays
     cap = zeros((len(altitudes), len(machs)))

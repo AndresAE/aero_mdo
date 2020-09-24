@@ -18,7 +18,7 @@ def main():
 def aero_report(plane_name):
     plane = __import__('src.airplanes.%s.plane' % plane_name, fromlist=['plane'])
     report = __import__('src.airplanes.%s.report' % plane_name, fromlist=['report'])
-    report.report_sweep(plane.plane, name=plane_name)
+    report.report_sweep(plane.plane, plane.requirements, name=plane_name)
     return
 
 

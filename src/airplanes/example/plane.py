@@ -199,6 +199,7 @@ requirements = {
     },
     'performance': {
         'bfl': 5000,  # [ft]
+        'to_altitude': 5000,  # [ft]
         'cruise_speed': 350,  # [ft/s]
         'cruise_altitude': 25000,  # [ft]
         'range': 500,  # [nm]
@@ -208,7 +209,8 @@ requirements = {
         'sm': 0.03,  # [% mac]
         'zeta_dr': 0.4,
         'zeta_sp': 0.4,
-        'time_to_roll': 30 / 1.5,  # [seconds] to 30 deg of roll
+        'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]
+        'crosswind': 15,  # [ft/s]
     }
 }
