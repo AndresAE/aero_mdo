@@ -45,12 +45,16 @@ def latdir_modes(aircraft, x_0, u_0):
     a, b, c, d = nonlinear_eom_to_ss(aircraft, x_ss, [0, 2], x_0, u_0, m, j)
     sys = StateSpace(a, b, c, d)
     wn, zeta, poles = damp(sys)
-    wn_dr = unique(wn[abs(zeta) != 1])  # [rad/s]
-    zeta_dr = unique(zeta[wn == wn_dr])  # []
+    wn_dr = unique(max(wn[abs(zeta) != 1]))  # [rad/s]
+    zeta_dr = unique(max(zeta[wn == wn_dr]))  # []
     re = real(poles)
     t = unique(re[abs(zeta) == 1])
-    t_r = -1 / min(t)
-    t_s = -1 / max(t)
+    if len(t) == 2:
+        t_r = -1 / min(t)
+        t_s = -1 / max(t)
+    else:
+        t_r = float("nan")
+        t_s = float("nan")
     return wn_dr, zeta_dr, t_r, t_s
 
 

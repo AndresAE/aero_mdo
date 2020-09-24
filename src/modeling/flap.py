@@ -9,7 +9,7 @@ def c_f_delta_flap(wing, control, mach):
     w = LiftingSurface(wing)
     c_l_a = w.c_l_alpha_wing(mach)
     s_a = flap_area(wing, control)
-    f = array([0, 0, -c_l_a * control['cf_c'] * s_a / s])
+    f = array([-0.0125 * control['cf_c'] * s_a / s, 0, -c_l_a * control['cf_c'] * s_a / s])
     return f
 
 

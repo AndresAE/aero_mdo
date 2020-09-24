@@ -40,6 +40,7 @@ def nonlinear_eom(x, m, j, c):
     b_body = ned_to_body(euler[0], euler[1], euler[2])
     navigation = b_body.transpose() @ v
     dx_dt = concatenate((concatenate((concatenate((linear_momentum, kinematics)), angular_momentum)), navigation))
+    dx_dt[-1] = - dx_dt[-1]
     return dx_dt
 
 

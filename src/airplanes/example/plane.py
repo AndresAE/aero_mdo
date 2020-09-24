@@ -2,7 +2,7 @@
 plane = {
     'wing': {
         'type': 'wing',
-        'planform': 650,  # [ft^2]
+        'planform': 700,  # [ft^2]
         'aspect_ratio': 8,  # []
         'sweep_LE': 5,  # [deg]
         'taper': 0.5,  # []
@@ -19,9 +19,9 @@ plane = {
         'n_controls': 4,  # []
         'control_1': {
             'name': 'aileron_l',
-            'cf_c': 0.15,
-            'b_1': -0.95,
-            'b_2': -0.85,
+            'cf_c': 0.25,
+            'b_1': -1,
+            'b_2': -0.75,
         },
         'control_2': {
             'name': 'flap_l',
@@ -37,9 +37,9 @@ plane = {
         },
         'control_4': {
             'name': 'aileron_r',
-            'cf_c': 0.15,
-            'b_1': 0.85,
-            'b_2': 0.95,
+            'cf_c': 0.25,
+            'b_1': 0.75,
+            'b_2': 1,
         },
     },
     'horizontal': {
@@ -60,12 +60,14 @@ plane = {
         'n_controls': 2,
         'control_1': {
             'name': 'elevator_l',
+            'limits': [-25, 15],  # [deg]
             'cf_c': 0.3,
             'b_1': -0.999,
             'b_2': -0.01,
         },
         'control_2': {
             'name': 'elevator_r',
+            'limits': [-25, 15],  # [deg]
             'cf_c': 0.3,
             'b_1': 0.01,
             'b_2': 0.999,
@@ -73,7 +75,7 @@ plane = {
     },
     'vertical': {
         'type': 'vertical',
-        'planform': 50,  # [ft^2]
+        'planform': 80,  # [ft^2]
         'aspect_ratio': 2,  # []
         'sweep_LE': 20,  # [deg]
         'taper': 0.5,  # []
@@ -87,8 +89,8 @@ plane = {
         'control_1': {
             'name': 'rudder',
             'cf_c': 0.3,
-            'b_1': 0.1,
-            'b_2': 0.9,
+            'b_1': 0,
+            'b_2': 1,
         },
     },
     'fuselage': {
@@ -102,15 +104,16 @@ plane = {
         'pax': 20
     },
     'weight': {
-        'weight': 39000,  # [lb]
+        'weight': 32000,  # [lb]
         'inertia': [[141933, 0, 30000], [0, 221088, 0], [30000, 0, 318803]],  # [slug*ft^2]
-        'cg': [44.5, 0, 3]  # [ft]
+        'cg': [44.5, 0, 1]  # [ft]
     },
     'propulsion': {
         'n_engines': 6,
-        'type': 'electric',
-        'battery_weight': 12000,  # [lb]
-        'efficiency': 0.75,
+        'const_mass': 1,
+        'fuel_mass': 6000 / 32.2,  # [slug]
+        'energy_density': 11.8 * 2655224 / 0.0685218,  # [ft^2 / s^2]
+        'total_efficiency': 0.4,
         'engine_1': {
             'type': 'prop',
             'station': 36,  # [ft]
@@ -119,7 +122,7 @@ plane = {
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 4,  # [ft]
-            'rpm_max': 10000,  # [rpm]
+            'rpm_max': 11000,  # [rpm]
             'pitch': 20  # [deg]
         },
         'engine_2': {
@@ -130,7 +133,7 @@ plane = {
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 4,  # [ft]
-            'rpm_max': 10000,  # [rpm]
+            'rpm_max': 11000,  # [rpm]
             'pitch': 20  # [deg]
         },
         'engine_3': {
@@ -141,7 +144,7 @@ plane = {
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 4,  # [ft]
-            'rpm_max': 10000,  # [rpm]
+            'rpm_max': 11000,  # [rpm]
             'pitch': 20  # [deg]
         },
         'engine_4': {
@@ -152,7 +155,7 @@ plane = {
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 4,  # [ft]
-            'rpm_max': 10000,  # [rpm]
+            'rpm_max': 11000,  # [rpm]
             'pitch': 20  # [deg]
         },
         'engine_5': {
@@ -163,7 +166,7 @@ plane = {
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 4,  # [ft]
-            'rpm_max': 10000,  # [rpm]
+            'rpm_max': 11000,  # [rpm]
             'pitch': 20  # [deg]
         },
         'engine_6': {
@@ -174,7 +177,7 @@ plane = {
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 4,  # [ft]
-            'rpm_max': 10000,  # [rpm]
+            'rpm_max': 11000,  # [rpm]
             'pitch': 20  # [deg]
         },
     },
@@ -187,7 +190,7 @@ plane = {
         'main_width': 1.5,  # [ft]
         'mu_roll': 0.02,
         'mu_brake': 0.1,
-        'c_d': 0.01
+        'c_d': 0.02
     },
 }
 requirements = {
@@ -205,7 +208,7 @@ requirements = {
         'sm': 0.03,  # [% mac]
         'zeta_dr': 0.4,
         'zeta_sp': 0.4,
-        'time_to_roll': 1.5,  # [seconds] to 30 deg of roll
-        'rotation_margin': 1,  # []
+        'time_to_roll': 30 / 1.5,  # [seconds] to 30 deg of roll
+        'rotation_margin': 1,  # [deg]
     }
 }

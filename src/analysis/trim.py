@@ -4,11 +4,50 @@ from scipy.optimize import minimize
 from src.common import Atmosphere
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import c_f_m, landing_gear_loads
-from src.modeling.trapezoidal_wing import mac
+from src.modeling.trapezoidal_wing import mac, span
 from src.modeling import Propulsion
 
 
 # Linear Trims
+def trim_aileron(aircraft, v, altitude, p):
+    """trim aircraft with aileron and rudder"""
+    a = Atmosphere(altitude).speed_of_sound()  # [ft/s]
+    mach = v / a
+    b = span(aircraft['wing']['aspect_ratio'], aircraft['wing']['planform'])
+    k = b / (2 * v)
+    p = deg2rad(p)
+    c_l_p = Aircraft(aircraft, mach).c_r_roll_rate()  # []
+    c_l_da = Aircraft(aircraft, mach).c_r_delta_aileron()  # []
+    da = - c_l_p * p * k / c_l_da
+    da = rad2deg(da)
+    return da
+
+
+def trim_aileron_rudder(aircraft, v, altitude, alpha, beta, p, r):
+    """trim aircraft with aileron and rudder"""
+    a = Atmosphere(altitude).speed_of_sound()  # [ft/s]
+    mach = v / a
+    b = span(aircraft['wing']['aspect_ratio'], aircraft['wing']['planform'])
+    k = b / (2 * v)
+    beta = deg2rad(beta)
+    p = deg2rad(p)
+    r = deg2rad(r)
+    c_l_b = Aircraft(aircraft, mach).c_r_beta(alpha)
+    c_l_p = Aircraft(aircraft, mach).c_r_roll_rate()  # []
+    c_l_r = Aircraft(aircraft, mach).c_r_yaw_rate(alpha)  # []
+    c_l_da = Aircraft(aircraft, mach).c_r_delta_aileron()  # []
+    c_l_dr = Aircraft(aircraft, mach).c_r_delta_rudder()  # []
+    c_n_b = Aircraft(aircraft, mach).c_n_beta(alpha)  # []
+    c_n_p = Aircraft(aircraft, mach).c_n_roll_rate(alpha)  # []
+    c_n_r = Aircraft(aircraft, mach).c_n_yaw_rate(alpha)  # []
+    c_n_da = Aircraft(aircraft, mach).c_n_delta_aileron()  # []
+    c_n_dr = Aircraft(aircraft, mach).c_n_delta_rudder()  # []
+    a = array([[c_l_da, c_l_dr], [c_n_da, c_n_dr]])
+    b = array([[-c_l_b * beta - c_l_p * p * k - c_l_r * r * k], [-c_n_b * beta - c_n_p * p * k - c_n_r * r * k]])
+    c = linalg.solve(a, b)  # [rad]
+    return rad2deg(c)
+
+
 def trim_alpha_de(aircraft, speed, altitude, gamma, n=1):
     """trim aircraft with angle of attack and elevator"""
     a = Atmosphere(altitude).speed_of_sound()  # [ft/s]
@@ -58,11 +97,31 @@ def trim_alpha_de_throttle(aircraft, speed, altitude, gamma, n=1):
     return c
 
 
-def trim_vr(aircraft, u_0):
+def trim_vs(aircraft, altitude, gamma, n=1):
+    """trim aircraft with angle of attack and elevator"""
+    rho = Atmosphere(altitude).air_density()  # [slug / ft^3]
+    mach = 0.3  # [] assume moderate mach number
+    c_l_a = Aircraft(aircraft, mach).c_l_alpha()  # [1/rad]
+    c_l_de = Aircraft(aircraft, mach).c_l_delta_elevator()  # [1/rad]
+    c_m_a = Aircraft(aircraft, mach).c_m_alpha()  # [1/rad]
+    c_m_de = Aircraft(aircraft, mach).c_m_delta_elevator()  # [1/rad]
+    c_l_0 = Aircraft(aircraft, mach).c_l_zero()  # []
+    w = aircraft['weight']['weight'] * n  # [lb]
+    s_w = aircraft['wing']['planform']  # [ft^2]
+    a_s = deg2rad(aircraft['wing']['alpha_stall'])
+    c_m_0 = Aircraft(aircraft, mach).c_m_zero(altitude)
+    a = array([[- w * cos(deg2rad(gamma)) / (0.5 * rho * s_w), c_l_de], [0, c_m_de]])
+    b = array([[-c_l_0 - c_l_a * a_s], [- c_m_0 - c_m_a * a_s]])
+    c = linalg.solve(a, b)  # [rad]
+    v_s = (1 / c[0]) ** 0.5
+    return v_s
+
+
+def trim_vr(aircraft, altitude, u_0):
     v = [5 * x for x in range(1, 100)]
     out = []
     for vi in v:
-        x = array([vi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        x = array([vi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, altitude])
         c = c_f_m(aircraft, x, u_0)
         c_t, c_g, normal_loads = landing_gear_loads(aircraft, x, c)
         out.append(float(normal_loads[0]))
@@ -70,7 +129,7 @@ def trim_vr(aircraft, u_0):
     return v_r
 
 
-# Optimization Trims
+# Nonlinear trims
 def trim(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
     # automate limits
     # add nonzero derivatives
