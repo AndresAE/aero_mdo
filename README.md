@@ -6,7 +6,7 @@ Subsonic, fixed-wing aircraft. Jet, and propeller propulsion systems.
 
 
 # Package Requirements
-control, numpy, matplotlib, pip, scipy, c++ compiler
+control, numpy, matplotlib, pip, scipy, c++ compiler. Will need a LaTex compiler to edit documentation.
 
 # To-Do
 Add tests for aircraft class.
