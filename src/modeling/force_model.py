@@ -84,7 +84,7 @@ def c_f_m(aircraft, x, u):
     return c
 
 
-def landing_gear_loads(aircraft, x, c, fix=False):
+def landing_gear_loads(aircraft, x, c, fix=False, brake=0):
     """return landing gear loads."""
     v = (x[0]**2+x[1]**2+x[2]**2)**0.5
     rho = Atmosphere(x[-1]).air_density()
@@ -94,7 +94,11 @@ def landing_gear_loads(aircraft, x, c, fix=False):
     x_2 = aircraft['weight']['cg'][0] - aircraft['landing_gear']['main'][0]
     z_1 = aircraft['weight']['cg'][2] - aircraft['landing_gear']['nose'][2]
     z_2 = aircraft['weight']['cg'][2] - aircraft['landing_gear']['main'][2]
-    mu = aircraft['landing_gear']['mu_roll']
+    mu_b = aircraft['landing_gear']['mu_brake']
+    mu_r = aircraft['landing_gear']['mu_roll']
+
+    mu = (mu_b - mu_r) * brake + mu_r
+
     a = array([[x_1 - mu * z_1, (x_2 - mu * z_2)], [-1, -1]])
     b = array([[c[4]], [c[2]]])
     normal_loads = linalg.inv(a) @ b

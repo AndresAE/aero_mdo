@@ -53,7 +53,7 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
         de.append(u_0[1]*180/pi)
         t = t + dt
         t_out.append(t)
-
+    x_rto = x
     u_0[1] = aircraft['horizontal']['control_1']['limits'][0] * pi / 180
     while pitch[-1] < aircraft['wing']['alpha_stall'] - rotate_margin:
         dxdt = takeoff_ground_roll(aircraft, x, u_0)
@@ -82,8 +82,8 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
         t = t + dt
         t_out.append(t)
     u_rto = u_0
-    u_rto[-1] = 0.01
-    v_rto, s_rto = rejected_takeoff(aircraft, s[-1], x, u_rto)
+    u_rto[-1] = 0.001
+    v_rto, s_rto = rejected_takeoff(aircraft, s[-1], x_rto, u_rto)
 
     plt.figure(figsize=(10, 8))
     plt.subplot(3, 1, 1)
@@ -222,9 +222,9 @@ def rejected_takeoff(aircraft, s_f, x_0, u_0):
     j = aircraft['weight']['inertia']
     x = []
     for vi in v:
-        x_0[0] = 0.707 * vi
+        x_0 [0] = 0.707 * vi
         c = c_f_m(aircraft, x_0, u_0)
-        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x_0, c, True)
+        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x_0, c, True, brake=1)
         dxdt = nonlinear_eom(x_0, m, j, c_t)
         x.append(s_f + (vi ** 2) / (2 * dxdt[0]))
     return v, x
