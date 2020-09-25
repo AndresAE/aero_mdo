@@ -28,6 +28,15 @@
 \usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
 % These packages are all incorporated in the memoir class to one degree or another...
 
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+\urlstyle{same}
+
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
 \pagestyle{fancy} % options: empty , plain , fancy
@@ -60,7 +69,7 @@
 \begin{document}
 \maketitle
 \begin{center}
-    \includegraphics[width=0.8\textwidth]{cover}
+    \includegraphics[width=1.1\textwidth]{cover}
 \end{center}
 
 \pagebreak
@@ -100,6 +109,12 @@ Your text goes here.
 \subsection{Balanced Field Length}
 
 More text.
+
+\subsection{PyTornado}
+
+Link to PyTornado Documentation: 
+
+\url{https://pytornado.readthedocs.io/en/latest/index.html}
 
 \subsection{Range}
 

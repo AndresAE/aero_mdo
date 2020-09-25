@@ -6,7 +6,10 @@ Subsonic, fixed-wing aircraft. Jet, and propeller propulsion systems.
 
 
 # Package Requirements
-control, numpy, matplotlib, pip, scipy
+control, numpy, matplotlib, pip, scipy, c++ compiler
 
 # To-Do
-Add tests for all current methods and classes, generalize trim routines. Turn trapezoidal wing into a class.
+Add tests for aircraft class.
+Add constraint analysis.
+Add aircraft structure weight estimates.
+Add FEA and FTR ratio to aero model.
