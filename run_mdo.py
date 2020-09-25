@@ -11,6 +11,8 @@ def main():
 
     if command == 'report':
         aero_report(plane)
+    elif command == 'design':
+        aero_design(plane)
     else:
         print('plane not found')
 
@@ -19,6 +21,13 @@ def aero_report(plane_name):
     plane = __import__('src.airplanes.%s.plane' % plane_name, fromlist=['plane'])
     report = __import__('src.airplanes.%s.report' % plane_name, fromlist=['report'])
     report.report_sweep(plane.plane, plane.requirements, name=plane_name)
+    return
+
+
+def aero_design(plane_name):
+    plane = __import__('src.airplanes.%s.plane' % plane_name, fromlist=['plane'])
+    design = __import__('src.airplanes.%s.design' % plane_name, fromlist=['design'])
+    design.report_sweep(plane.plane, plane.requirements, name=plane_name)
     return
 
 
