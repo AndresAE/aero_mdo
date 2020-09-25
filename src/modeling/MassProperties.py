@@ -1,4 +1,6 @@
-from src.common import Earth
+from numpy import pi, round
+from src.common import Atmosphere, Earth, unit_conversions
+from src.modeling.Propulsion import propeller
 from src.modeling.trapezoidal_wing import span
 g = Earth(0).gravity()  # [f/s2]
 
@@ -43,3 +45,60 @@ class MassProperties:
         """return empirical aircraft xz axis inertia estimate."""
         i_xz = 0 * self.aircraft['weight']['weight']
         return i_xz
+
+
+def wing_weight():
+    """return wing weight."""
+    return 0
+
+
+def fuselage_weight():
+    """return wing weight."""
+    return 0
+
+
+def landing_gear_weight():
+    """return wing weight."""
+    return 0
+
+
+def propulsion_weight(engine):
+    """return engine weight."""
+    t = propeller(engine, [0, 0, 0], 0, 1)
+    t = (sum(t[0:3] ** 2)) ** 0.5
+    rho = Atmosphere(0).air_density()
+    a = pi * (engine['diameter'] / 2) ** 2
+    u_e = (2 * t / (rho * a)) ** 0.5
+    u_disk = u_e / 2
+    p = t * u_disk
+    w_p = p * unit_conversions.lbft_s2hp() / unit_conversions.electric_hp_lb()
+    return w_p
+
+
+def fcs_weight():
+    """return wing weight."""
+    return 0
+
+
+def avionics_weight():
+    """return wing weight."""
+    return 0
+
+
+def passenger_weight(n_pax):
+    """return passenger weight, includes furnishings."""
+    n_fa = round(n_pax / 20)
+    w_pax = (200 + 33) * (n_pax + n_fa)
+    return w_pax
+
+
+def cargo_weight(n_pax):
+    """return cargo/luggage weight."""
+    n_fa = 2 + round(n_pax / 20)
+    w_cargo = 50 * (n_pax + n_fa)
+    return w_cargo
+
+
+def air_conditioning_weight():
+    """return wing weight."""
+    return 0

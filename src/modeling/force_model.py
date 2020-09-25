@@ -45,7 +45,7 @@ def c_f_m(aircraft, x, u):
               ac.c_l_alpha_dot() * alpha_dot +
               ac.c_l_pitch_rate() * q_hat +
               ac.c_l_delta_elevator() * d_elevator) ** 2)
-            / ac.c_l_alpha())
+            / (ac.c_l_alpha() / 2 * aircraft['wing']['aspect_ratio']))
 
     c_y = (ac.c_y_beta() * beta +
            ac.c_y_roll_rate(alpha) * p_hat +

@@ -4,7 +4,7 @@ plane = {
         'type': 'wing',
         'planform': 700,  # [ft^2]
         'aspect_ratio': 8,  # []
-        'sweep_LE': 5,  # [deg]
+        'sweep_LE': 0,  # [deg]
         'taper': 0.5,  # []
         'station': 37.5,  # [ft]
         'buttline': 0,  # [ft]

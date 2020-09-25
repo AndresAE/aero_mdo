@@ -39,8 +39,8 @@ def nonlinear_eom(x, m, j, c):
     # navigation equations
     b_body = ned_to_body(euler[0], euler[1], euler[2])
     navigation = b_body.transpose() @ v
+    navigation[-1] = - navigation[-1]   # positive altitude
     dx_dt = concatenate((concatenate((concatenate((linear_momentum, kinematics)), angular_momentum)), navigation))
-    dx_dt[-1] = - dx_dt[-1]
     return dx_dt
 
 

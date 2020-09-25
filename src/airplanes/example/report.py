@@ -39,6 +39,7 @@ def report_sweep(plane, requirements, name=''):
     t_roll = zeros((len(altitudes), len(machs)))
     t_2_d_sp = zeros((len(altitudes), len(machs)))
     dr_beta = zeros((len(altitudes), len(machs)))
+    da_beta = zeros((len(altitudes), len(machs)))
     da_roll = zeros((len(altitudes), len(machs)))
     r = zeros((len(altitudes), len(machs)))
 
@@ -68,6 +69,7 @@ def report_sweep(plane, requirements, name=''):
             c_r[i_alt, i_mach] = lateral_stability(plane, mach_i, aoa)
             out_beta = trim_aileron_rudder(plane, v, alt_i, float(aoa), beta, 0, 0)
             dr_beta[i_alt, i_mach] = out_beta[1]
+            da_beta[i_alt, i_mach] = out_beta[0]
             out_p = trim_aileron(plane, v, alt_i, p)
             da_roll[i_alt, i_mach] = out_p
 
@@ -182,12 +184,19 @@ def report_sweep(plane, requirements, name=''):
         plt.close()
 
     plt.figure()
+    plt.subplot(2, 1, 1)
     for i_alt in range(0, len(altitudes)):
         plt.plot(machs, dr_beta[i_alt, :], label="Alt %d ft" % (altitudes[i_alt]))
     plt.title('Sideslip')
     plt.grid(True)
     plt.legend()
     plt.ylabel('rudder [deg]')
+    plt.subplot(2, 1, 2)
+    for i_alt in range(0, len(altitudes)):
+        plt.plot(machs, da_beta[i_alt, :], label="Alt %d ft" % (altitudes[i_alt]))
+    plt.grid(True)
+    plt.legend()
+    plt.ylabel('aileron [deg]')
     plt.xlabel('Mach')
     plt.savefig(path + '/sideslip_capability.png')
     plt.close()
