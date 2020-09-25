@@ -81,21 +81,30 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
         de.append(u_0[1] * 180 / pi)
         t = t + dt
         t_out.append(t)
+    u_rto = u_0
+    u_rto[-1] = 0.01
+    v_rto, s_rto = rejected_takeoff(aircraft, s[-1], x, u_rto)
 
     plt.figure(figsize=(10, 8))
     plt.subplot(3, 1, 1)
     plt.plot(s, v)
+    plt.plot(s_rto, v_rto, 'r')
     plt.ylabel('v [ft/s]')
+    plt.ylim((0, max(v) + 20))
+    plt.xlim((0, s[-1] + 10))
     plt.grid(True)
     plt.subplot(3, 1, 2)
     plt.plot(s, h)
     plt.ylabel('h [ft]')
+    plt.xlim((0, s[-1] + 10))
     plt.grid(True)
     plt.subplot(3, 1, 3)
     plt.plot(s, pitch, label='pitch')
     plt.plot(s, de, label='Elevator')
     plt.legend()
     plt.ylabel('angles [deg]')
+    plt.xlabel('distance [ft]')
+    plt.xlim((0, s[-1] + 10))
     plt.grid(True)
 
 
@@ -204,3 +213,18 @@ def takeoff_ground_roll(aircraft, x_0, u_0):
     c_t, c_g, normal_loads = landing_gear_loads(aircraft, x_0, c, True)
     dxdt = nonlinear_eom(x_0, m, j, c_t)
     return dxdt
+
+
+def rejected_takeoff(aircraft, s_f, x_0, u_0):
+    """return derivatives for aircraft on ground."""
+    v = [5 * x for x in range(1, 100)]
+    m = aircraft['weight']['weight']/g
+    j = aircraft['weight']['inertia']
+    x = []
+    for vi in v:
+        x_0[0] = 0.707 * vi
+        c = c_f_m(aircraft, x_0, u_0)
+        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x_0, c, True)
+        dxdt = nonlinear_eom(x_0, m, j, c_t)
+        x.append(s_f + (vi ** 2) / (2 * dxdt[0]))
+    return v, x
