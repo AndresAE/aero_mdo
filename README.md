@@ -1,12 +1,14 @@
 # aero_mdo
-Aircraft multidisciplinary design software
+Aircraft Multidisciplinary Design Software
 
 #Supports:
-Subsonic, fixed-wing aircraft. Jet, and propeller propulsion systems.
+Subsonic, fixed-wing aircraft. Jet, and propeller propulsion systems. 
+Rigid aircraft assumption, but this will be addressed in future releases.
 
 
 # Package Requirements
-control, numpy, matplotlib, pip, scipy, c++ compiler. Will need a LaTex compiler to edit documentation.
+control, numpy, matplotlib, pip, scipy, avlwrapper. Will need a LaTex compiler to edit documentation.
+Will need to add avl.exe to $PATH. A copy of avl.exe is included in this repository.
 
 # To-Do
 Add tests for aircraft class.

@@ -6,6 +6,7 @@ from src.modeling.Fuselage import Fuselage
 from src.modeling.LiftingSurface import LiftingSurface
 from src.modeling.trapezoidal_wing import mac, span, x_mac, y_mac
 k_yv = 1
+a_zl = 0
 
 
 class Aircraft:
@@ -61,9 +62,9 @@ class Aircraft:
         s_w = wing['planform']  # [ft^2]
         ht = self.plane['horizontal']
         s_ht = ht['planform']  # [ft^2]
-        c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence'] - wing['alpha_zero_lift']))  # []
+        c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence'] - a_zl))  # []
         epsilon = 2 * c_l_0_w / (pi * wing['aspect_ratio'])  # [rad]
-        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - ht['alpha_zero_lift'] - epsilon))  # []
+        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - epsilon))  # []
         c_l_0 = c_l_0_w + c_l_0_ht  # []
         return c_l_0
 
@@ -119,10 +120,10 @@ class Aircraft:
         x_ac_w_bar = self.x_ac_w / c_bar  # []
         x_ac_ht_bar = self.x_ac_ht / c_bar  # []
 
-        c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence'] - wing['alpha_zero_lift']))  # []
+        c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence'] - a_zl))  # []
         c_m_0_w = c_l_0_w * (cg_bar - x_ac_w_bar)
         epsilon = 2 * c_l_0_w / (pi * wing['aspect_ratio'])  # [rad]
-        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - ht['alpha_zero_lift'] - epsilon))  # []
+        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - epsilon))  # []
 
         z_w = (z_cg - wing['waterline']) / c_bar
         z_ht = (z_cg - ht['waterline']) / c_bar
@@ -134,7 +135,7 @@ class Aircraft:
         c_m_0_vt_d = - LiftingSurface(vt).parasite_drag(self.mach, altitude) * s_vt / s_w * z_vt
         c_m_0_f_d = - Fuselage(self.plane).parasite_drag_fuselage(self.mach, altitude) * z_f
         c_m_0_ht = c_l_0_ht * (x_ac_ht_bar - cg_bar)
-        c_m_0 = (wing['airfoil_cm0'] + ht['airfoil_cm0'] + c_m_0_w + c_m_0_ht
+        c_m_0 = (c_m_0_w + c_m_0_ht
                  + c_m_0_w_d + c_m_0_ht_d + c_m_0_vt_d + c_m_0_f_d)  # []
         return c_m_0
 

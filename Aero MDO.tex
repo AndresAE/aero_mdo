@@ -21,13 +21,6 @@
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 
 %%% PACKAGES
-\usepackage{booktabs} % for much better looking tables
-\usepackage{array} % for better arrays (eg matrices) in maths
-\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
-\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
-\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
-% These packages are all incorporated in the memoir class to one degree or another...
-
 \usepackage{hyperref}
 \hypersetup{
     colorlinks=true,
@@ -35,7 +28,12 @@
     filecolor=magenta,      
     urlcolor=cyan,
 }
-\urlstyle{same}
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
 
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
@@ -56,6 +54,7 @@
 \renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
 \renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
 
+\urlstyle{same}
 %%% END Article customizations
 
 %%% The "real" document content comes below...
@@ -110,12 +109,6 @@ Your text goes here.
 
 More text.
 
-\subsection{PyTornado}
-
-Link to PyTornado Documentation: 
-
-\url{https://pytornado.readthedocs.io/en/latest/index.html}
-
 \subsection{Range}
 
 More text.
@@ -139,6 +132,13 @@ Your text goes here.
 \subsection{Aerodynamics}
 
 More text.
+
+\subsection{Athena Vortex Lattice}
+
+Link to MIT Athena Vortex Lattice Method (AVL): \\
+\url{http://web.mit.edu/drela/Public/web/avl/}
+
+AVL.exe is included in the repository, and should be added to the PATH of your system. The resulting data from AVL is obtained using the avlwrapper API. 
 
 \subsection{Propulsion}
 

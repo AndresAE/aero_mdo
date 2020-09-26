@@ -11,10 +11,7 @@ plane = {
         'waterline': 1,  # [ft]
         'incidence': 0,  # [deg]
         'dihedral': 0,  # [deg]
-        'c_l_alpha': 5,  # [1/rad]
-        'alpha_zero_lift': -1,  # [deg]
-        'airfoil_thickness': 0.15,  # []
-        'airfoil_cm0': 0,  # []
+        'airfoils': ['4412', '4412'],  # [naca airfoils]
         'alpha_stall': 12,  # [deg]
         'n_controls': 4,  # []
         'control_1': {
@@ -53,10 +50,7 @@ plane = {
         'waterline': 7,  # [ft]
         'incidence': 0,  # [deg]
         'dihedral': 0,  # [deg]
-        'c_l_alpha': 5,  # [1/rad]
-        'alpha_zero_lift': 0,  # [deg]
-        'airfoil_thickness': 0.1,  # []
-        'airfoil_cm0': 0,  # []
+        'airfoils': ['0012', '0012'],  # [naca airfoils]
         'n_controls': 2,
         'control_1': {
             'name': 'elevator_l',
@@ -82,9 +76,7 @@ plane = {
         'station': 78,  # [ft]
         'buttline': 0,  # [ft]
         'waterline': 8,  # [ft]
-        'c_l_alpha': 5,  # [1/rad]
-        'alpha_zero_lift': 0,  # [deg]
-        'airfoil_thickness': 0.15,  # []
+        'airfoils': ['0012', '0012'],  # [naca airfoils]
         'n_controls': 1,
         'control_1': {
             'name': 'rudder',
@@ -106,7 +98,7 @@ plane = {
     'weight': {
         'weight': 32000,  # [lb]
         'inertia': [[141933, 0, 30000], [0, 221088, 0], [30000, 0, 318803]],  # [slug*ft^2]
-        'cg': [44.5, 0, 1]  # [ft]
+        'cg': [42, 0, 1]  # [ft]
     },
     'propulsion': {
         'n_engines': 6,

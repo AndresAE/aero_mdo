@@ -1,8 +1,8 @@
 """Returns force and moment coefficients for lifting surfaces."""
-from numpy import sqrt, cos, deg2rad
+from numpy import sqrt, cos, deg2rad, pi
 from src.modeling.aerodynamics import polhamus, friction_coefficient, pressure_drag
 from src.modeling.trapezoidal_wing import root_chord, mac, span, sweep_x, x_mac, y_mac
-
+t_c = 0.15
 
 class LiftingSurface:
     def __init__(self, wing):
@@ -10,7 +10,7 @@ class LiftingSurface:
 
     def c_l_alpha_wing(self, mach):
         """return lifting surface lift curve slope."""
-        c_l_alpha = self.wing['c_l_alpha']  # [1/rad] 2-D
+        c_l_alpha = 2 * pi
         ar = self.wing['aspect_ratio']  # []
         sweep_le = self.wing['sweep_LE']  # [deg]
         taper = self.wing['taper']  # []
@@ -46,11 +46,11 @@ class LiftingSurface:
 
     def parasite_drag(self, mach, altitude):
         """return parasitic drag coefficient of the lifting surface."""
-        s_wet_s = (2 + 2 * (self.wing['airfoil_thickness'] / self.wing['aspect_ratio']) +
-                   2 * self.wing['airfoil_thickness'])  # []
+        s_wet_s = (2 + 2 * (t_c / self.wing['aspect_ratio']) +
+                   2 * t_c)  # []
         c_bar = mac(self.wing['aspect_ratio'], self.wing['planform'], self.wing['taper'])  # [ft]
         c_f = friction_coefficient(mach, altitude, c_bar)  # []
-        c_d_p = pressure_drag(self.wing['airfoil_thickness'])
+        c_d_p = pressure_drag(t_c)
         c_d_0 = c_d_p * c_f * s_wet_s  # []
         return c_d_0
 

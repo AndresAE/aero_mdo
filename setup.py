@@ -171,6 +171,11 @@ def import_tests():
     except ImportError:
         raise ImportError('control is required for this package')
 
+    try:
+        import avlwrapper
+    except ImportError:
+        raise ImportError('avlwrapper is required for this package')
+
     return
 
 
