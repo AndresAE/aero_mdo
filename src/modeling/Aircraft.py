@@ -6,7 +6,6 @@ from src.modeling.Fuselage import Fuselage
 from src.modeling.LiftingSurface import LiftingSurface
 from src.modeling.trapezoidal_wing import mac, span, x_mac, y_mac
 k_yv = 1
-a_zl = 0
 
 
 class Aircraft:
@@ -62,9 +61,13 @@ class Aircraft:
         s_w = wing['planform']  # [ft^2]
         ht = self.plane['horizontal']
         s_ht = ht['planform']  # [ft^2]
+        naca = wing['airfoils'][1]
+        a_zl = -int(naca[0])
         c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence'] - a_zl))  # []
         epsilon = 2 * c_l_0_w / (pi * wing['aspect_ratio'])  # [rad]
-        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - epsilon))  # []
+        naca = ht['airfoils'][1]
+        a_zl_ht = - int(naca[0])
+        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - a_zl_ht - epsilon))  # []
         c_l_0 = c_l_0_w + c_l_0_ht  # []
         return c_l_0
 
@@ -120,10 +123,14 @@ class Aircraft:
         x_ac_w_bar = self.x_ac_w / c_bar  # []
         x_ac_ht_bar = self.x_ac_ht / c_bar  # []
 
+        naca = wing['airfoils'][1]
+        a_zl = - int(naca[0])
+        naca = ht['airfoils'][1]
+        a_zl_ht = - int(naca[0])
         c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence'] - a_zl))  # []
         c_m_0_w = c_l_0_w * (cg_bar - x_ac_w_bar)
         epsilon = 2 * c_l_0_w / (pi * wing['aspect_ratio'])  # [rad]
-        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - epsilon))  # []
+        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - a_zl_ht - epsilon))  # []
 
         z_w = (z_cg - wing['waterline']) / c_bar
         z_ht = (z_cg - ht['waterline']) / c_bar

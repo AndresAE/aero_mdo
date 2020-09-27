@@ -11,7 +11,7 @@ plane = {
         'waterline': 1,  # [ft]
         'incidence': 0,  # [deg]
         'dihedral': 0,  # [deg]
-        'airfoils': ['4412', '4412'],  # [naca airfoils]
+        'airfoil': '2212',  # [naca airfoils]
         'alpha_stall': 12,  # [deg]
         'n_controls': 4,  # []
         'control_1': {
@@ -42,41 +42,41 @@ plane = {
     'horizontal': {
         'type': 'wing',
         'planform': 100,  # [ft^2]
-        'aspect_ratio': 4,  # []
+        'aspect_ratio': 5,  # []
         'sweep_LE': 10,  # [deg]
         'taper': 0.465,  # []
         'station': 85,  # [ft]
         'buttline': 0,  # [ft]
-        'waterline': 7,  # [ft]
+        'waterline': 0,  # [ft]
         'incidence': 0,  # [deg]
         'dihedral': 0,  # [deg]
-        'airfoils': ['0012', '0012'],  # [naca airfoils]
+        'airfoil': '0012',  # [naca airfoils]
         'n_controls': 2,
         'control_1': {
             'name': 'elevator_l',
             'limits': [-25, 15],  # [deg]
             'cf_c': 0.3,
-            'b_1': -0.999,
-            'b_2': -0.01,
+            'b_1': -0.8,
+            'b_2': -0.1,
         },
         'control_2': {
             'name': 'elevator_r',
             'limits': [-25, 15],  # [deg]
             'cf_c': 0.3,
-            'b_1': 0.01,
-            'b_2': 0.999,
+            'b_1': 0,
+            'b_2': 1,
         },
     },
     'vertical': {
         'type': 'vertical',
         'planform': 80,  # [ft^2]
-        'aspect_ratio': 2,  # []
+        'aspect_ratio': 4,  # []
         'sweep_LE': 20,  # [deg]
         'taper': 0.5,  # []
         'station': 78,  # [ft]
         'buttline': 0,  # [ft]
-        'waterline': 8,  # [ft]
-        'airfoils': ['0012', '0012'],  # [naca airfoils]
+        'waterline': 0,  # [ft]
+        'airfoil': '0012',  # [naca airfoils]
         'n_controls': 1,
         'control_1': {
             'name': 'rudder',

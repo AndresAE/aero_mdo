@@ -30,7 +30,7 @@ def span(ar, s, mirror=1):
         scalar = 1
     else:
         scalar = 2
-    b = sqrt(ar * s * scalar)  # [ft]
+    b = sqrt(ar * s / scalar)  # [ft]
     return b
 
 

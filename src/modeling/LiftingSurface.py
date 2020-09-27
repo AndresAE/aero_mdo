@@ -2,7 +2,7 @@
 from numpy import sqrt, cos, deg2rad, pi
 from src.modeling.aerodynamics import polhamus, friction_coefficient, pressure_drag
 from src.modeling.trapezoidal_wing import root_chord, mac, span, sweep_x, x_mac, y_mac
-t_c = 0.15
+
 
 class LiftingSurface:
     def __init__(self, wing):
@@ -46,6 +46,8 @@ class LiftingSurface:
 
     def parasite_drag(self, mach, altitude):
         """return parasitic drag coefficient of the lifting surface."""
+        t_c = self.wing['airfoils'][1]
+        t_c = int(t_c[-2:]) / 100
         s_wet_s = (2 + 2 * (t_c / self.wing['aspect_ratio']) +
                    2 * t_c)  # []
         c_bar = mac(self.wing['aspect_ratio'], self.wing['planform'], self.wing['taper'])  # [ft]
