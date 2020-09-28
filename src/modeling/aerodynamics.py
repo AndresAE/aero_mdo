@@ -45,7 +45,7 @@ def create_aero_model_avl(aircraft, requirements):
             ia = ia + 1
         im = im + 1
 
-    save_aero_model(model, aircraft['name'])
+    save_aero_model(model, aircraft['name'])  # create directory if it doesn't exist
     return model
 
 
