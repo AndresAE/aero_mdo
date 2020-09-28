@@ -61,13 +61,13 @@ class Aircraft:
         s_w = wing['planform']  # [ft^2]
         ht = self.plane['horizontal']
         s_ht = ht['planform']  # [ft^2]
-        naca = wing['airfoils'][1]
+        naca = wing['airfoil']
         a_zl = -int(naca[0])
-        c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence'] - a_zl))  # []
+        c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence']) - deg2rad(a_zl))  # []
         epsilon = 2 * c_l_0_w / (pi * wing['aspect_ratio'])  # [rad]
-        naca = ht['airfoils'][1]
+        naca = ht['airfoil']
         a_zl_ht = - int(naca[0])
-        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - a_zl_ht - epsilon))  # []
+        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence']) - deg2rad(a_zl_ht) - epsilon)  # []
         c_l_0 = c_l_0_w + c_l_0_ht  # []
         return c_l_0
 
@@ -123,14 +123,14 @@ class Aircraft:
         x_ac_w_bar = self.x_ac_w / c_bar  # []
         x_ac_ht_bar = self.x_ac_ht / c_bar  # []
 
-        naca = wing['airfoils'][1]
+        naca = wing['airfoil']
         a_zl = - int(naca[0])
-        naca = ht['airfoils'][1]
+        naca = ht['airfoil']
         a_zl_ht = - int(naca[0])
-        c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence'] - a_zl))  # []
+        c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence']) - deg2rad(a_zl))  # []
         c_m_0_w = c_l_0_w * (cg_bar - x_ac_w_bar)
         epsilon = 2 * c_l_0_w / (pi * wing['aspect_ratio'])  # [rad]
-        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence'] - a_zl_ht - epsilon))  # []
+        c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence']) - deg2rad(a_zl_ht) - epsilon)  # []
 
         z_w = (z_cg - wing['waterline']) / c_bar
         z_ht = (z_cg - ht['waterline']) / c_bar

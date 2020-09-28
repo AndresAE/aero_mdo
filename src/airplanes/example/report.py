@@ -1,23 +1,24 @@
 from matplotlib import pyplot as plt
-from numpy import arctan, array, cos, deg2rad, rad2deg, sin, zeros
-from src.common import Atmosphere
-from src.common import Earth
+from numpy import arctan, array, cos, deg2rad, linspace, rad2deg, sin, zeros
+from src.common import Atmosphere, Earth
+from src.common.report_tools import create_output_dir, plot_or_save
 from src.analysis.lateral_directional import directional_stability, lateral_stability, dutch_roll_mode, plot_dr, \
     roll_mode, spiral_mode
 from src.analysis.longitudinal import aircraft_range, balanced_field_length, maneuvering, short_period_mode, plot_sp, \
     static_margin, specific_excess_power
 from src.analysis.trim import trim_aileron, trim_aileron_rudder, trim_alpha_de
-import os
 g = Earth(0).gravity()  # f/s2
+show_plot = 0
+save_plot = 1
 
 
 # Sweep
 def report_sweep(plane, requirements, name=''):
-    cwd = os.getcwd()
-    path = cwd + '/src/airplanes/'+name+'/output'
-    os.mkdir(path)
-    machs = array([0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6])
-    altitudes = array([0, 5000, 10000, 15000, 20000, 25000, 30000, 35000])
+    create_output_dir(name)
+    machs = linspace(requirements['flight_envelope']['mach'][0],
+                     requirements['flight_envelope']['mach'][1], 5)
+    altitudes = linspace(requirements['flight_envelope']['altitude'][0],
+                         requirements['flight_envelope']['altitude'][1], 3)
 
     # Requirements
     n_z = [requirements['loads']['n_z'][0], 1, requirements['loads']['n_z'][1]]  # [g]
@@ -85,8 +86,7 @@ def report_sweep(plane, requirements, name=''):
     x_0 = array([float(0.01), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, h_to])
     u_0 = array([0.0, 0.0, 0.0, 1])
     balanced_field_length(plane, x_0, u_0)
-    plt.savefig(path + '/balanced_field_length.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'balanced_field_length')
 
     # plotting
     plt.figure()
@@ -97,8 +97,7 @@ def report_sweep(plane, requirements, name=''):
     plt.legend()
     plt.ylabel('SM [%MAC]')
     plt.xlabel('Mach')
-    plt.savefig(path + '/static_margin.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'static_margin')
 
     plt.figure()
     for i_alt in range(0, len(altitudes)):
@@ -108,8 +107,7 @@ def report_sweep(plane, requirements, name=''):
     plt.legend()
     plt.ylabel('CNBeta [1/rad]')
     plt.xlabel('Mach')
-    plt.savefig(path + '/directional_stability.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'directional_stability')
 
     plt.figure()
     for i_alt in range(0, len(altitudes)):
@@ -119,8 +117,7 @@ def report_sweep(plane, requirements, name=''):
     plt.legend()
     plt.ylabel('CLBeta [1/rad]')
     plt.xlabel('Mach')
-    plt.savefig(path + '/lateral_stability.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'lateral_stability')
 
     plt.figure()
     for i_alt in range(0, len(altitudes)):
@@ -130,8 +127,7 @@ def report_sweep(plane, requirements, name=''):
     plt.grid(True)
     plt.legend()
     plot_dr()
-    plt.savefig(path + '/dutch_roll.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'dutch_roll')
 
     plt.figure()
     for i_alt in range(0, len(altitudes)):
@@ -141,8 +137,7 @@ def report_sweep(plane, requirements, name=''):
     plt.grid(True)
     plt.legend()
     plot_sp()
-    plt.savefig(path + '/short_period.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'short_period')
 
     plt.figure()
     for i_alt in range(0, len(altitudes)):
@@ -152,8 +147,7 @@ def report_sweep(plane, requirements, name=''):
     plt.legend()
     plt.ylabel('Roll Time Constant [sec]')
     plt.xlabel('Mach')
-    plt.savefig(path + '/roll_mode.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'roll_mode')
 
     plt.figure()
     for i_alt in range(0, len(altitudes)):
@@ -163,8 +157,7 @@ def report_sweep(plane, requirements, name=''):
     plt.legend()
     plt.ylabel('Time To Double [sec]')
     plt.xlabel('Mach')
-    plt.savefig(path + '/spiral_mode.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'spiral_mode')
 
     for i_alt in range(0, len(altitudes)):
         fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
@@ -180,8 +173,7 @@ def report_sweep(plane, requirements, name=''):
         axes[1].set_ylabel('Angle of Attack [deg]')
         axes[1].legend()
         axes[1].grid(True)
-        plt.savefig(path + "/maneuver_capability_%d.png" % (altitudes[i_alt]))
-        plt.close()
+        plot_or_save(plt, show_plot, save_plot, name, 'maneuver_capability_%d' % (altitudes[i_alt]))
 
     plt.figure()
     plt.subplot(2, 1, 1)
@@ -198,8 +190,7 @@ def report_sweep(plane, requirements, name=''):
     plt.legend()
     plt.ylabel('aileron [deg]')
     plt.xlabel('Mach')
-    plt.savefig(path + '/sideslip_capability.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'sideslip_capability')
 
     plt.figure()
     for i_alt in range(0, len(altitudes)):
@@ -209,8 +200,7 @@ def report_sweep(plane, requirements, name=''):
     plt.legend()
     plt.ylabel('aileron [deg]')
     plt.xlabel('Mach')
-    plt.savefig(path + '/roll_control.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'roll_control')
 
     plt.figure()
     levels = [0, 100, 500, 1000]
@@ -220,16 +210,14 @@ def report_sweep(plane, requirements, name=''):
     plt.grid(True)
     plt.xlabel('Mach')
     plt.ylabel('Altitude [ft]')
-    plt.savefig(path + '/specific_excess_power.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'specific_excess_power')
 
     plt.figure()
-    levels = [2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000]
+    levels = linspace(0, 5000, 51)
     cs = plt.contour(machs, altitudes, r, levels)
     plt.clabel(cs, levels, fmt='%1.0f')
     plt.title('range [nm]')
     plt.grid(True)
     plt.xlabel('Mach')
     plt.ylabel('Altitude [ft]')
-    plt.savefig(path + '/range.png')
-    plt.close()
+    plot_or_save(plt, show_plot, save_plot, name, 'range')

@@ -114,3 +114,7 @@ def landing_gear_loads(aircraft, x, c, fix=False, brake=0):
     c_gear = c_normal + c_drag + c_friction
     c_total = c + c_gear
     return c_total, c_gear, normal_loads
+
+
+def nonlinear_aero_forces():
+    return 0

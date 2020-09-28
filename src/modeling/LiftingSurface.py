@@ -46,7 +46,7 @@ class LiftingSurface:
 
     def parasite_drag(self, mach, altitude):
         """return parasitic drag coefficient of the lifting surface."""
-        t_c = self.wing['airfoils'][1]
+        t_c = self.wing['airfoil']
         t_c = int(t_c[-2:]) / 100
         s_wet_s = (2 + 2 * (t_c / self.wing['aspect_ratio']) +
                    2 * t_c)  # []

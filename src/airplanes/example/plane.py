@@ -1,5 +1,6 @@
 """airplane geometry file."""
 plane = {
+    'name': 'example',
     'wing': {
         'type': 'wing',
         'planform': 700,  # [ft^2]
@@ -11,29 +12,33 @@ plane = {
         'waterline': 1,  # [ft]
         'incidence': 0,  # [deg]
         'dihedral': 0,  # [deg]
-        'airfoil': '2212',  # [naca airfoils]
+        'airfoil': '4412',  # [naca airfoils]
         'alpha_stall': 12,  # [deg]
         'n_controls': 4,  # []
         'control_1': {
             'name': 'aileron_l',
+            'limits': [-15, 15],  # [deg]
             'cf_c': 0.25,
             'b_1': -1,
             'b_2': -0.75,
         },
         'control_2': {
             'name': 'flap_l',
+            'limits': [0, 15],  # [deg]
             'cf_c': 0.2,
             'b_1': -0.7,
             'b_2': -0.2,
         },
         'control_3': {
             'name': 'flap_r',
+            'limits': [0, 15],  # [deg]
             'cf_c': 0.2,
             'b_1': 0.2,
             'b_2': 0.7,
         },
         'control_4': {
             'name': 'aileron_r',
+            'limits': [-15, 15],  # [deg]
             'cf_c': 0.25,
             'b_1': 0.75,
             'b_2': 1,
@@ -56,32 +61,33 @@ plane = {
             'name': 'elevator_l',
             'limits': [-25, 15],  # [deg]
             'cf_c': 0.3,
-            'b_1': -0.8,
-            'b_2': -0.1,
+            'b_1': -1,
+            'b_2': 0.1,
         },
         'control_2': {
             'name': 'elevator_r',
             'limits': [-25, 15],  # [deg]
             'cf_c': 0.3,
-            'b_1': 0,
+            'b_1': 0.1,
             'b_2': 1,
         },
     },
     'vertical': {
         'type': 'vertical',
-        'planform': 80,  # [ft^2]
+        'planform': 100,  # [ft^2]
         'aspect_ratio': 4,  # []
         'sweep_LE': 20,  # [deg]
         'taper': 0.5,  # []
         'station': 78,  # [ft]
         'buttline': 0,  # [ft]
-        'waterline': 0,  # [ft]
+        'waterline': 1,  # [ft]
         'airfoil': '0012',  # [naca airfoils]
         'n_controls': 1,
         'control_1': {
             'name': 'rudder',
+            'limits': [-15, 15],  # [deg]
             'cf_c': 0.3,
-            'b_1': 0,
+            'b_1': 0.1,
             'b_2': 1,
         },
     },
@@ -96,9 +102,9 @@ plane = {
         'pax': 20
     },
     'weight': {
-        'weight': 32000,  # [lb]
+        'weight': 30000,  # [lb]
         'inertia': [[141933, 0, 30000], [0, 221088, 0], [30000, 0, 318803]],  # [slug*ft^2]
-        'cg': [42, 0, 1]  # [ft]
+        'cg': [43, 0, 5]  # [ft]
     },
     'propulsion': {
         'n_engines': 6,
@@ -204,5 +210,14 @@ requirements = {
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]
         'crosswind': 15,  # [ft/s]
+    },
+    'flight_envelope': {
+        'mach': [0.2, 0.6],
+        'alpha': [-5, 15],  # [deg]
+        'beta': [-10, 10],  # [deg]
+        'p': [-20, 20],  # [deg/s]
+        'q': [-20, 20],  # [deg/s]
+        'r': [-20, 20],  # [deg/s]
+        'altitude': [0, 30000]  # [ft]
     }
 }

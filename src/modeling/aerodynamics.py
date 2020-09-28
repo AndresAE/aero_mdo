@@ -1,8 +1,64 @@
 """Contains aerodynamic calculations."""
 import avlwrapper as avl
-from numpy import deg2rad, log10, pi, rad2deg, sqrt, tan
+from numpy import deg2rad, linspace, log10, pi, rad2deg, sqrt, tan, zeros
 from src.common import Atmosphere
-from src.modeling.trapezoidal_wing import mac, root_chord, span,sweep_x, x_mac, y_chord
+from src.common.report_tools import save_aero_model
+from src.modeling.trapezoidal_wing import mac, root_chord, span, sweep_x, y_chord
+
+
+def create_aero_model_avl(aircraft, requirements):
+    # baseline_sweep
+    mach = linspace(requirements['flight_envelope']['mach'][0], requirements['flight_envelope']['mach'][1], num=3)
+    alpha = linspace(requirements['flight_envelope']['alpha'][0], requirements['flight_envelope']['alpha'][1], num=5)
+    beta = linspace(requirements['flight_envelope']['beta'][0], requirements['flight_envelope']['beta'][1], num=5)
+    p = linspace(requirements['flight_envelope']['p'][0], requirements['flight_envelope']['p'][1], num=3)
+    q = linspace(requirements['flight_envelope']['q'][0], requirements['flight_envelope']['q'][1], num=3)
+    r = linspace(requirements['flight_envelope']['r'][0], requirements['flight_envelope']['r'][1], num=3)
+    d_a = linspace(aircraft['wing']['control_4']['limits'][0], aircraft['wing']['control_4']['limits'][1], num=3)
+    d_e = linspace(aircraft['horizontal']['control_2']['limits'][0],
+                   aircraft['horizontal']['control_2']['limits'][1], num=3)
+    d_r = linspace(aircraft['vertical']['control_1']['limits'][0],
+                   aircraft['vertical']['control_1']['limits'][1], num=3)
+
+    model = {'baseline': {'mach': mach, 'alpha': alpha, 'cfm': cfm_array(mach, alpha)},
+             'lat_dir': {'mach': mach, 'beta': beta, 'cfm': cfm_array(mach, beta)},
+             'aileron': {'mach': mach, 'd_aileron': d_a, 'cfm': cfm_array(mach, d_a)},
+             'elevator': {'mach': mach, 'd_elevator': d_e, 'cfm': cfm_array(mach, d_e)},
+             'rudder': {'mach': mach, 'd_rudder': d_r, 'cfm': cfm_array(mach, d_r)},  # add alpha
+             'p': {'mach': mach, 'p': p, 'cfm': cfm_array(mach, p)},
+             'q': {'mach': mach, 'q': q, 'cfm': cfm_array(mach, q)},
+             'r': {'mach': mach, 'r': r, 'cfm': cfm_array(mach, r)},
+             }
+
+    # ADD METHOD TO LOOP
+    im = 0
+    for mi in mach:
+        ia = 0
+        for ai in alpha:
+            out = run_avl(aircraft, mi, ai, 0, 0, 0, 0, [0, 0, 0, 0])
+            model['baseline']['cfm']['cd'][im, ia] = out[0]
+            model['baseline']['cfm']['cy'][im, ia] = out[1]
+            model['baseline']['cfm']['cl'][im, ia] = out[2]
+            model['baseline']['cfm']['cmr'][im, ia] = out[3]
+            model['baseline']['cfm']['cmp'][im, ia] = out[4]
+            model['baseline']['cfm']['cmy'][im, ia] = out[5]
+            ia = ia + 1
+        im = im + 1
+
+    save_aero_model(model, aircraft['name'])
+    return model
+
+
+def cfm_array(x, y):
+    out = {
+        'cd': zeros((len(x), len(y))),
+        'cy': zeros((len(x), len(y))),
+        'cl': zeros((len(x), len(y))),
+        'cmr': zeros((len(x), len(y))),
+        'cmp': zeros((len(x), len(y))),
+        'cmy': zeros((len(x), len(y))),
+    }
+    return out
 
 
 def dynamic_pressure(mach, altitude):
@@ -56,66 +112,45 @@ def reynolds_number(mach, altitude, x_ref):
     return re
 
 
-def run_avl(aircraft, mach, alpha, beta, p, q, r, u):
+def run_avl(aircraft, mach, alpha, beta, p, q, r, u, iplot=0):
     case_name = 'zero_alpha'
-    roll_rate = deg2rad(p)
-    pitch_rate = deg2rad(q)
-    yaw_rate = deg2rad(r)
+    roll_rate = p  # [rad/s]
+    pitch_rate = q  # [rad/s]
+    yaw_rate = r  # [rad/s]
     d_aileron = rad2deg(u[0])  # deg
-    d_elevator = rad2deg(u[0])  # deg
-    d_rudder = rad2deg(u[0])  # deg
+    d_elevator = rad2deg(u[1])  # deg
+    d_rudder = rad2deg(u[2])  # deg
+    gains = [-1, 1, 1]
 
     wing = aircraft['wing']
     ht = aircraft['horizontal']
     vt = aircraft['vertical']
-
     wing_aspect_ratio = wing['aspect_ratio']
     wing_area = wing['planform']
     wing_taper = wing['taper']
-    wing_le_sweep = deg2rad(wing['sweep_LE'])
-    wing_dihedral = deg2rad(wing['dihedral'])
     wing_root_le_pnt = avl.Point(wing['station'], wing['buttline'], wing['waterline'])
-    wing_root_airfoil = wing['airfoil']
-    wing_tip_airfoil = wing['airfoil']
-    x_hinge_w = wing['control_1']['cf_c']
-
     ht_aspect_ratio = ht['aspect_ratio']
     ht_area = ht['planform']
-    ht_taper = ht['taper']
-    ht_sweep = deg2rad(ht['sweep_LE'])
-    ht_dihedral = deg2rad(ht['dihedral'])
     ht_root_le_pnt = avl.Point(ht['station'], ht['buttline'], ht['waterline'])
-    ht_root_airfoil = ht['airfoil']
-    ht_tip_airfoil = ht['airfoil']
-    x_hinge_ht = ht['control_1']['cf_c']
-
     vt_aspect_ratio = vt['aspect_ratio']
     vt_area = vt['planform']
-    vt_taper = vt['taper']
-    vt_sweep = deg2rad(vt['sweep_LE'])
     vt_root_le_pnt = avl.Point(vt['station'], vt['buttline'], vt['waterline'])
-    vt_root_airfoil = vt['airfoil']
-    vt_tip_airfoil = vt['airfoil']
-    x_hinge_vt = vt['control_1']['cf_c']
-    cs_name_vt = vt['control_1']['name']
 
-    a = 1116
+    a = Atmosphere(0).speed_of_sound()
     ref_pnt = avl.Point(aircraft['weight']['cg'][0], aircraft['weight']['cg'][1], aircraft['weight']['cg'][2])
 
     # Wing -------------------------------------------------------------------------------------------------------------
     wing_span = span(wing_aspect_ratio, wing_area)
     wing_mac = mac(wing_aspect_ratio, wing_area, wing_taper)
-    wing_root_chord = root_chord(wing_aspect_ratio, wing_area, wing_taper)
-    wing_tip_chord = wing_root_chord * wing_taper
-    wing_tip_le_pnt = avl.Point(x=wing_root_le_pnt[0] + x_mac(0.5 * wing_span, rad2deg(wing_le_sweep)),
-                                y=wing_root_le_pnt[1] + 0.5 * wing_span,
-                                z=wing_root_le_pnt[2] + 0.5 * wing_span * tan(wing_dihedral))
-    root_section = avl.Section(leading_edge_point=wing_root_le_pnt,
-                               chord=wing_root_chord,
-                               airfoil=avl.NacaAirfoil(wing_root_airfoil))
-    tip_section = avl.Section(leading_edge_point=wing_tip_le_pnt,
-                              chord=wing_tip_chord,
-                              airfoil=avl.NacaAirfoil(wing_tip_airfoil))
+    sections = list()
+    if not wing['control_4']['b_1'] == 0:
+        sections.append(avl_section(wing_root_le_pnt[1], 0, wing, 1, []))
+    sections.append(avl_section(wing_root_le_pnt[1] + wing_span * 0.5 * wing['control_4']['b_1'],
+                    wing['control_4'], wing, 1, 'aileron', duplicate_sign=-1))
+    sections.append(avl_section(wing_root_le_pnt[1] + wing_span * 0.5 * wing['control_4']['b_2'],
+                    wing['control_4'], wing, 1, 'aileron', duplicate_sign=-1))
+    if not wing['control_4']['b_2'] == 1:
+        sections.append(avl_section(wing_root_le_pnt[1] + wing_span * 0.5, 0, wing, 1, []))
 
     # y_duplicate=0.0 duplicates the wing over a XZ-plane at Y=0.0
     wing = avl.Surface(name='wing',
@@ -124,59 +159,43 @@ def run_avl(aircraft, mach, alpha, beta, p, q, r, u):
                        n_spanwise=20,
                        span_spacing=avl.Spacing.cosine,
                        y_duplicate=0.0,
-                       sections=[root_section, tip_section])
+                       sections=sections)
 
     # HT ---------------------------------------------------------------------------------------------------------------
-    elevator = avl.Control(name='elevator',
-                           gain=1,
-                           x_hinge=x_hinge_ht,
-                           duplicate_sign=1)
     ht_span = span(ht_aspect_ratio, ht_area)
-    ht_root_chord = root_chord(ht_aspect_ratio, ht_area, ht_taper, mirror=0)
-    ht_tip_chord = ht_root_chord * ht_taper
-    ht_tip_le_pnt = avl.Point(x=ht_root_le_pnt[0] + x_mac(0.5 * ht_span, rad2deg(ht_sweep)),
-                              y=ht_root_le_pnt[1] + 0.5 * ht_span,
-                              z=ht_root_le_pnt[2] + 0.5 * ht_span * tan(ht_dihedral))
-    root_section = avl.Section(leading_edge_point=ht_root_le_pnt,
-                               chord=ht_root_chord,
-                               airfoil=avl.NacaAirfoil(ht_root_airfoil),
-                               controls=[elevator])
-    tip_section = avl.Section(leading_edge_point=ht_tip_le_pnt,
-                              chord=ht_tip_chord,
-                              airfoil=avl.NacaAirfoil(ht_tip_airfoil),
-                              controls=[elevator])
+    sections = list()
+    if not ht['control_2']['b_1'] == 0:
+        sections.append(avl_section(ht_root_le_pnt[1], 0, ht, 1, []))
+    sections.append(avl_section(ht_root_le_pnt[1] + ht_span * 0.5 * ht['control_2']['b_1'],
+                    ht['control_2'], ht, 1, 'elevator'))
+    sections.append(avl_section(ht_root_le_pnt[1] + ht_span * 0.5 * ht['control_2']['b_2'],
+                    ht['control_2'], ht, 1, 'elevator'))
+    if not ht['control_2']['b_2'] == 1:
+        sections.append(avl_section(ht_root_le_pnt[1] + ht_span * 0.5, 0, ht, 1, []))
     horizontal_tail = avl.Surface(name='horizontal_tail',
                                   n_chordwise=12,
                                   chord_spacing=avl.Spacing.cosine,
                                   n_spanwise=20,
                                   span_spacing=avl.Spacing.cosine,
                                   y_duplicate=0.0,
-                                  sections=[root_section, tip_section])
+                                  sections=sections)
     # VT ---------------------------------------------------------------------------------------------------------------
-    rudder = avl.Control(name=cs_name_vt,
-                         gain=1,
-                         x_hinge=x_hinge_vt,
-                         duplicate_sign=1)
     vt_span = span(vt_aspect_ratio, vt_area, mirror=0)
-    vt_root_chord = root_chord(vt_aspect_ratio, vt_area, vt_taper, mirror=0)
-    vt_tip_chord = vt_root_chord * vt_taper
-    vt_tip_le_pnt = avl.Point(x=vt_root_le_pnt.x + vt_span * tan(vt_sweep),
-                              y=vt_root_le_pnt.y,
-                              z=vt_root_le_pnt.z + vt_span)
-    root_section = avl.Section(leading_edge_point=vt_root_le_pnt,
-                               chord=vt_root_chord,
-                               airfoil=avl.NacaAirfoil(vt_root_airfoil),
-                               controls=[rudder])
-    tip_section = avl.Section(leading_edge_point=vt_tip_le_pnt,
-                              chord=vt_tip_chord,
-                              airfoil=avl.NacaAirfoil(vt_tip_airfoil),
-                              controls=[rudder])
+    sections = list()
+    if not vt['control_1']['b_1'] == 0:
+        sections.append(avl_section(vt_root_le_pnt[1], 0, vt, 0, []))
+    sections.append(avl_section(vt_root_le_pnt[1] + vt_span * vt['control_1']['b_1'],
+                    vt['control_1'], vt, 0, 'rudder'))
+    sections.append(avl_section(vt_root_le_pnt[1] + vt_span * vt['control_1']['b_2'],
+                    vt['control_1'], vt, 0, 'rudder'))
+    if not vt['control_1']['b_2'] == 1:
+        sections.append(avl_section(vt_root_le_pnt[1] + vt_span, 0, vt, 0, []))
     vertical_tail = avl.Surface(name='vertical_tail',
                                 n_chordwise=12,
                                 chord_spacing=avl.Spacing.cosine,
                                 n_spanwise=20,
                                 span_spacing=avl.Spacing.cosine,
-                                sections=[root_section, tip_section])
+                                sections=sections)
     # Setup ------------------------------------------------------------------------------------------------------------
     aircraft = avl.Geometry(name='aircraft',
                             reference_area=wing_area,
@@ -196,16 +215,21 @@ def run_avl(aircraft, mach, alpha, beta, p, q, r, u):
                 session_1.show_trefftz_plot(idx + 1)  # cases start from 1
 
     simple_case = avl.Case(name=case_name,
-                           alpha=0)
+                           alpha=alpha, beta=beta,
+                           aileron=gains[0] * d_aileron, elevator=gains[1] * d_elevator, rudder=gains[2] * d_rudder,
+                           roll_rate=roll_rate * wing_span/(2 * mach * a),
+                           pitch_rate=pitch_rate * wing_span/(2 * mach * a),
+                           yaw_rate=yaw_rate * wing_span/(2 * mach * a))
     session = avl.Session(geometry=aircraft, cases=[simple_case])
 
-    if 'gs_bin' in session.config.settings:
-        img = session.save_geometry_plot()[0]
-        avl.show_image(img)
-    else:
-        session.show_geometry()
+    if iplot:
+        if 'gs_bin' in session.config.settings:
+            img = session.save_geometry_plot()[0]
+            avl.show_image(img)
+        else:
+            session.show_geometry()
 
-    show_treffz(session)
+        show_treffz(session)
 
     # results are in a dictionary
     result = session.run_all_cases()
@@ -219,23 +243,29 @@ def run_avl(aircraft, mach, alpha, beta, p, q, r, u):
     return [cd, cy, cl, cmr, cmp, cmy]
 
 
-def avl_section(y, cs, wing, mirror, name):
+def avl_section(y, cs, wing, mirror, cs_name, duplicate_sign=1):
     b = span(wing['aspect_ratio'], wing['planform'], mirror=mirror)
     c_r = root_chord(wing['aspect_ratio'], wing['planform'], wing['taper'], mirror=mirror)
-    chord = y_chord(y, c_r, b, wing['taper'])
     wing_root_le_pnt = avl.Point(wing['station'], wing['buttline'], wing['waterline'])
-    le_point = avl.Point(x=wing_root_le_pnt.x + y * tan(deg2rad(wing['sweep_LE'])),
-                         y=y,
-                         z=wing_root_le_pnt.z + y * tan(deg2rad(wing['dihedral'])))
+    if mirror:
+        le_point = avl.Point(x=wing_root_le_pnt.x + y * tan(deg2rad(wing['sweep_LE'])),
+                             y=y,
+                             z=wing_root_le_pnt.z + y * tan(deg2rad(wing['dihedral'])))
+        chord = y_chord(y, c_r, b, wing['taper'])
+    else:
+        le_point = avl.Point(x=wing_root_le_pnt.x + y * tan(deg2rad(wing['sweep_LE'])),
+                             y=wing_root_le_pnt.y,
+                             z=wing_root_le_pnt.z + y)
+        chord = y_chord(y, c_r, b * 2, wing['taper'])
     if cs == 0:
         section = avl.Section(leading_edge_point=le_point,
                               chord=chord,
                               airfoil=avl.NacaAirfoil(wing['airfoil']))
     else:
-        control = avl.Control(name=name,
+        control = avl.Control(name=cs_name,
                               gain=1,
                               x_hinge=1 - cs['cf_c'],
-                              duplicate_sign=1)
+                              duplicate_sign=duplicate_sign)
         section = avl.Section(leading_edge_point=le_point,
                               chord=chord,
                               airfoil=avl.NacaAirfoil(wing['airfoil']),
