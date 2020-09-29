@@ -97,6 +97,18 @@ def trim_alpha_de_throttle(aircraft, speed, altitude, gamma, n=1):
     return c
 
 
+def trim_vr(aircraft, altitude, u_0):
+    v = [5 * x for x in range(1, 100)]
+    out = []
+    for vi in v:
+        x = array([vi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, altitude])
+        c = c_f_m(aircraft, x, u_0)
+        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x, c)
+        out.append(float(normal_loads[0]))
+    v_r = interp(0, out, v)
+    return v_r
+
+
 def trim_vs(aircraft, altitude, gamma, n=1):
     """trim aircraft with angle of attack and elevator"""
     rho = Atmosphere(altitude).air_density()  # [slug / ft^3]
@@ -113,20 +125,8 @@ def trim_vs(aircraft, altitude, gamma, n=1):
     a = array([[- w * cos(deg2rad(gamma)) / (0.5 * rho * s_w), c_l_de], [0, c_m_de]])
     b = array([[-c_l_0 - c_l_a * a_s], [- c_m_0 - c_m_a * a_s]])
     c = linalg.solve(a, b)  # [rad]
-    v_s = (1 / c[0]) ** 0.5
+    v_s = float((1 / c[0]) ** 0.5)
     return v_s
-
-
-def trim_vr(aircraft, altitude, u_0):
-    v = [5 * x for x in range(1, 100)]
-    out = []
-    for vi in v:
-        x = array([vi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, altitude])
-        c = c_f_m(aircraft, x, u_0)
-        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x, c)
-        out.append(float(normal_loads[0]))
-    v_r = interp(0, out, v)
-    return v_r
 
 
 # Nonlinear trims

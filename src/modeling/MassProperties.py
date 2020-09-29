@@ -97,8 +97,3 @@ def cargo_weight(n_pax):
     n_fa = 2 + round(n_pax / 20)
     w_cargo = 50 * (n_pax + n_fa)
     return w_cargo
-
-
-def air_conditioning_weight():
-    """return wing weight."""
-    return 0

@@ -1,6 +1,6 @@
 import csv
 from matplotlib import pyplot as plt
-from numpy import array, polyfit, polyval
+from numpy import array, linspace, polyfit, polyval
 import os
 
 cur_path = os.path.dirname(__file__)
@@ -87,7 +87,7 @@ plt.ylabel('MTOW')
 plt.grid(True)
 plt.show()
 
-x_fit = array([0, 500, 5000])
+x_fit = linspace(0, 5000, 50)
 plt.figure(figsize=(12, 7))
 plt.plot(wing_area['wide'], ew['wide'], 'ro', label='wide')
 plt.plot(wing_area['narrow'], ew['narrow'], 'bo', label='narrow')

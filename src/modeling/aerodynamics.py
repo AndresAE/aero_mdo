@@ -1,64 +1,53 @@
 """Contains aerodynamic calculations."""
 import avlwrapper as avl
-from numpy import deg2rad, linspace, log10, pi, rad2deg, sqrt, tan, zeros
+from numpy import array, concatenate, deg2rad, linspace, log10, pi, sort, sqrt, tan, unique, zeros
 from src.common import Atmosphere
 from src.common.report_tools import save_aero_model
 from src.modeling.trapezoidal_wing import mac, root_chord, span, sweep_x, y_chord
 
 
 def create_aero_model_avl(aircraft, requirements):
+    """create aero model using aircraft requirements with linear AVL method."""
     # baseline_sweep
-    mach = linspace(requirements['flight_envelope']['mach'][0], requirements['flight_envelope']['mach'][1], num=3)
+    mach = linspace(requirements['flight_envelope']['mach'][0], requirements['flight_envelope']['mach'][1], num=4)
     alpha = linspace(requirements['flight_envelope']['alpha'][0], requirements['flight_envelope']['alpha'][1], num=5)
+    alpha = sort(unique(concatenate((alpha, array([0])))))
     beta = linspace(requirements['flight_envelope']['beta'][0], requirements['flight_envelope']['beta'][1], num=5)
-    p = linspace(requirements['flight_envelope']['p'][0], requirements['flight_envelope']['p'][1], num=3)
-    q = linspace(requirements['flight_envelope']['q'][0], requirements['flight_envelope']['q'][1], num=3)
-    r = linspace(requirements['flight_envelope']['r'][0], requirements['flight_envelope']['r'][1], num=3)
-    d_a = linspace(aircraft['wing']['control_4']['limits'][0], aircraft['wing']['control_4']['limits'][1], num=3)
+    p = linspace(requirements['flight_envelope']['p'][0], requirements['flight_envelope']['p'][1], num=5)
+    q = linspace(requirements['flight_envelope']['q'][0], requirements['flight_envelope']['q'][1], num=5)
+    r = linspace(requirements['flight_envelope']['r'][0], requirements['flight_envelope']['r'][1], num=5)
+    d_a = linspace(aircraft['wing']['control_4']['limits'][0], aircraft['wing']['control_4']['limits'][1], num=5)
     d_e = linspace(aircraft['horizontal']['control_2']['limits'][0],
-                   aircraft['horizontal']['control_2']['limits'][1], num=3)
+                   aircraft['horizontal']['control_2']['limits'][1], num=4)
+    d_e = sort(unique(concatenate((d_e, array([0])))))
     d_r = linspace(aircraft['vertical']['control_1']['limits'][0],
-                   aircraft['vertical']['control_1']['limits'][1], num=3)
+                   aircraft['vertical']['control_1']['limits'][1], num=5)
 
-    model = {'baseline': {'mach': mach, 'alpha': alpha, 'cfm': cfm_array(mach, alpha)},
-             'lat_dir': {'mach': mach, 'beta': beta, 'cfm': cfm_array(mach, beta)},
-             'aileron': {'mach': mach, 'd_aileron': d_a, 'cfm': cfm_array(mach, d_a)},
-             'elevator': {'mach': mach, 'd_elevator': d_e, 'cfm': cfm_array(mach, d_e)},
-             'rudder': {'mach': mach, 'd_rudder': d_r, 'cfm': cfm_array(mach, d_r)},  # add alpha
-             'p': {'mach': mach, 'p': p, 'cfm': cfm_array(mach, p)},
-             'q': {'mach': mach, 'q': q, 'cfm': cfm_array(mach, q)},
-             'r': {'mach': mach, 'r': r, 'cfm': cfm_array(mach, r)},
+    model = {'mrc': aircraft['weight']['cg'],
+             'baseline': {'mach': mach, 'alpha': alpha,
+                          'cfm': sweep_avl_2d(aircraft, mach, alpha,
+                                              'run_avl(aircraft, ix, iy, 0, 0, 0, 0, [0, 0, 0, 0])')},
+             'lat_dir': {'mach': mach, 'beta': beta,
+                         'cfm': sweep_avl_2d(aircraft, mach, beta,
+                                             'run_avl(aircraft, ix, 0, iy, 0, 0, 0, [0, 0, 0, 0])')},
+             'aileron': {'mach': mach, 'd_aileron': d_a,
+                         'cfm': sweep_avl_2d(aircraft, mach, d_a,
+                                             'run_avl(aircraft, ix, 0, 0, 0, 0, 0, [iy, 0, 0, 0])')},
+             'elevator': {'mach': mach, 'd_elevator': d_e,
+                          'cfm': sweep_avl_2d(aircraft, mach, d_e,
+                                              'run_avl(aircraft, ix, 0, 0, 0, 0, 0, [0, iy, 0, 0])')},
+             'rudder': {'mach': mach, 'd_rudder': d_r, 'alpha': alpha,
+                        'cfm': sweep_avl_2d(aircraft, mach, d_r,
+                                            'run_avl(aircraft, ix, 0, 0, 0, 0, 0, [0, 0, iy, 0])')},
+             'p': {'mach': mach, 'p': p,
+                   'cfm': sweep_avl_2d(aircraft, mach, p, 'run_avl(aircraft, ix, 0, 0, iy, 0, 0, [0, 0, 0, 0])')},
+             'q': {'mach': mach, 'q': q,
+                   'cfm': sweep_avl_2d(aircraft, mach, q, 'run_avl(aircraft, ix, 0, 0, 0, iy, 0, [0, 0, 0, 0])')},
+             'r': {'mach': mach, 'r': r,
+                   'cfm': sweep_avl_2d(aircraft, mach, r, 'run_avl(aircraft, ix, 0, 0, 0, 0, iy, [0, 0, 0, 0])')},
              }
-
-    # ADD METHOD TO LOOP
-    im = 0
-    for mi in mach:
-        ia = 0
-        for ai in alpha:
-            out = run_avl(aircraft, mi, ai, 0, 0, 0, 0, [0, 0, 0, 0])
-            model['baseline']['cfm']['cd'][im, ia] = out[0]
-            model['baseline']['cfm']['cy'][im, ia] = out[1]
-            model['baseline']['cfm']['cl'][im, ia] = out[2]
-            model['baseline']['cfm']['cmr'][im, ia] = out[3]
-            model['baseline']['cfm']['cmp'][im, ia] = out[4]
-            model['baseline']['cfm']['cmy'][im, ia] = out[5]
-            ia = ia + 1
-        im = im + 1
-
     save_aero_model(model, aircraft['name'])  # create directory if it doesn't exist
     return model
-
-
-def cfm_array(x, y):
-    out = {
-        'cd': zeros((len(x), len(y))),
-        'cy': zeros((len(x), len(y))),
-        'cl': zeros((len(x), len(y))),
-        'cmr': zeros((len(x), len(y))),
-        'cmp': zeros((len(x), len(y))),
-        'cmy': zeros((len(x), len(y))),
-    }
-    return out
 
 
 def dynamic_pressure(mach, altitude):
@@ -113,13 +102,14 @@ def reynolds_number(mach, altitude, x_ref):
 
 
 def run_avl(aircraft, mach, alpha, beta, p, q, r, u, iplot=0):
+    """run Athena Vortex Lattice Method."""
     case_name = 'zero_alpha'
-    roll_rate = p  # [rad/s]
-    pitch_rate = q  # [rad/s]
-    yaw_rate = r  # [rad/s]
-    d_aileron = rad2deg(u[0])  # deg
-    d_elevator = rad2deg(u[1])  # deg
-    d_rudder = rad2deg(u[2])  # deg
+    roll_rate = deg2rad(p)  # [rad/s]
+    pitch_rate = deg2rad(q)  # [rad/s]
+    yaw_rate = deg2rad(r)  # [rad/s]
+    d_aileron = u[0]  # deg
+    d_elevator = u[1]  # deg
+    d_rudder = u[2]  # deg
     gains = [-1, 1, 1]
 
     wing = aircraft['wing']
@@ -244,6 +234,7 @@ def run_avl(aircraft, mach, alpha, beta, p, q, r, u, iplot=0):
 
 
 def avl_section(y, cs, wing, mirror, cs_name, duplicate_sign=1):
+    """create avl wing section."""
     b = span(wing['aspect_ratio'], wing['planform'], mirror=mirror)
     c_r = root_chord(wing['aspect_ratio'], wing['planform'], wing['taper'], mirror=mirror)
     wing_root_le_pnt = avl.Point(wing['station'], wing['buttline'], wing['waterline'])
@@ -271,3 +262,29 @@ def avl_section(y, cs, wing, mirror, cs_name, duplicate_sign=1):
                               airfoil=avl.NacaAirfoil(wing['airfoil']),
                               controls=[control])
     return section
+
+
+def sweep_avl_2d(aircraft, x, y, run_string):
+    """execute sweep of key in AVL."""
+    out = {
+        'cd': zeros((len(x), len(y))),
+        'cy': zeros((len(x), len(y))),
+        'cl': zeros((len(x), len(y))),
+        'cmr': zeros((len(x), len(y))),
+        'cmp': zeros((len(x), len(y))),
+        'cmy': zeros((len(x), len(y))),
+    }
+    ii = 0
+    for ix in x:
+        jj = 0
+        for iy in y:
+            out_avl = eval(run_string)
+            out['cd'][ii, jj] = out_avl[0]
+            out['cy'][ii, jj] = out_avl[1]
+            out['cl'][ii, jj] = out_avl[2]
+            out['cmr'][ii, jj] = out_avl[3]
+            out['cmp'][ii, jj] = out_avl[4]
+            out['cmy'][ii, jj] = out_avl[5]
+            jj = jj + 1
+        ii = ii + 1
+    return out

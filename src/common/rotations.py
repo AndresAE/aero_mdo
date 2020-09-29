@@ -35,3 +35,9 @@ def ned_to_body(phi, theta, psi):
                [s(phi)*s(psi)+c(phi)*s(theta)*c(psi), -s(phi)*c(psi)+c(phi)*s(theta)*s(psi), c(phi)*c(theta)]
                ])
     return b
+
+
+# def translate_mrc(mrc, mrc_new, cfm):
+#     """translate forces and moments to new moment reference center."""
+#     cfm_new[0:3] = cfm[3:6]
+#     return cfm_new

@@ -11,6 +11,10 @@ control, numpy, matplotlib, pip, scipy, avlwrapper. Will need a LaTex compiler t
 Will need to add avl.exe to $PATH. A copy of avl.exe is included in this repository.
 
 # To-Do
+## Short-Term
+Add mass properties.
+Finish MRC translation method.
+## Long-Term
 Add tests for aircraft class.
 Add constraint analysis.
 Add aircraft structure weight estimates.

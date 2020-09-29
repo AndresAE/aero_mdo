@@ -180,6 +180,21 @@ def plot_sp():
     plt.yscale("log")
 
 
+def rejected_takeoff(aircraft, s_f, x_0, u_0):
+    """return derivatives for aircraft on ground."""
+    v = [5 * x for x in range(1, 100)]
+    m = aircraft['weight']['weight']/g
+    j = aircraft['weight']['inertia']
+    x = []
+    for vi in v:
+        x_0[0] = 0.707 * vi
+        c = c_f_m(aircraft, x_0, u_0)
+        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x_0, c, True, brake=1)
+        dxdt = nonlinear_eom(x_0, m, j, c_t)
+        x.append(s_f + (vi ** 2) / (2 * dxdt[0]))
+    return v, x
+
+
 def short_period_mode(aircraft, x_0, u_0):
     """return short-period modal criteria."""
     wn_sp, zeta_sp, wn_ph, zeta_ph = long_modes(aircraft, x_0, u_0)
@@ -213,18 +228,3 @@ def takeoff_ground_roll(aircraft, x_0, u_0):
     c_t, c_g, normal_loads = landing_gear_loads(aircraft, x_0, c, True)
     dxdt = nonlinear_eom(x_0, m, j, c_t)
     return dxdt
-
-
-def rejected_takeoff(aircraft, s_f, x_0, u_0):
-    """return derivatives for aircraft on ground."""
-    v = [5 * x for x in range(1, 100)]
-    m = aircraft['weight']['weight']/g
-    j = aircraft['weight']['inertia']
-    x = []
-    for vi in v:
-        x_0 [0] = 0.707 * vi
-        c = c_f_m(aircraft, x_0, u_0)
-        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x_0, c, True, brake=1)
-        dxdt = nonlinear_eom(x_0, m, j, c_t)
-        x.append(s_f + (vi ** 2) / (2 * dxdt[0]))
-    return v, x
