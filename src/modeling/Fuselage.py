@@ -6,6 +6,13 @@ class Fuselage:
     def __init__(self, aircraft):
         self.plane = aircraft
 
+    def cross_section(self):
+        return a, b, w, dy, rf
+
+    def far_25_length(self):
+
+        return l_fus
+
     def parasite_drag_fuselage(self, mach, altitude):
         """return parasitic drag coefficient of the fuselage."""
         fuselage = self.plane['fuselage']

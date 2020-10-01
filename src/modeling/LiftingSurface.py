@@ -10,7 +10,7 @@ class LiftingSurface:
 
     def c_l_alpha_wing(self, mach):
         """return lifting surface lift curve slope."""
-        c_l_alpha = 2 * pi
+        c_l_alpha = 2 * pi * 0.9
         ar = self.wing['aspect_ratio']  # []
         sweep_le = self.wing['sweep_LE']  # [deg]
         taper = self.wing['taper']  # []

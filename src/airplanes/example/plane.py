@@ -104,7 +104,7 @@ plane = {
     'weight': {
         'weight': 30000,  # [lb]
         'inertia': [[141933, 0, 30000], [0, 221088, 0], [30000, 0, 318803]],  # [slug*ft^2]
-        'cg': [43, 0, 5]  # [ft]
+        'cg': [41, 0, 5]  # [ft]
     },
     'propulsion': {
         'n_engines': 6,
@@ -198,7 +198,7 @@ requirements = {
     'performance': {
         'bfl': 5000,  # [ft]
         'to_altitude': 5000,  # [ft]
-        'cruise_speed': 350,  # [ft/s]
+        'cruise_mach': 0.5,  # [ft/s]
         'cruise_altitude': 25000,  # [ft]
         'range': 500,  # [nm]
     },

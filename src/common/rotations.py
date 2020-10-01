@@ -1,4 +1,4 @@
-from numpy import array, cos as c, sin as s, tan as t
+from numpy import array, cos as c, cross, sin as s, tan as t
 
 
 def angular_rate_rotation(phi, theta):
@@ -37,7 +37,9 @@ def ned_to_body(phi, theta, psi):
     return b
 
 
-# def translate_mrc(mrc, mrc_new, cfm):
-#     """translate forces and moments to new moment reference center."""
-#     cfm_new[0:3] = cfm[3:6]
-#     return cfm_new
+def translate_mrc(mrc, mrc_new, cfm):
+    """translate forces and moments to new moment reference center."""
+    r = array([mrc[0], mrc[1], mrc[2]]) - array([mrc_new[0], mrc_new[1], mrc_new[2]])
+    cfm_new = cfm
+    cfm_new[3:6] = cfm[3:6] + cross(r, cfm[0:3])
+    return cfm_new

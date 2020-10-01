@@ -5,7 +5,7 @@ from src.modeling.flap import c_f_m_flap
 from src.modeling.Fuselage import Fuselage
 from src.modeling.LiftingSurface import LiftingSurface
 from src.modeling.trapezoidal_wing import mac, span, x_mac, y_mac
-k_yv = 1
+k_yv = 0.7
 
 
 class Aircraft:
@@ -62,11 +62,11 @@ class Aircraft:
         ht = self.plane['horizontal']
         s_ht = ht['planform']  # [ft^2]
         naca = wing['airfoil']
-        a_zl = -int(naca[0])
+        a_zl = -1.1 * int(naca[0])
         c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence']) - deg2rad(a_zl))  # []
         epsilon = 2 * c_l_0_w / (pi * wing['aspect_ratio'])  # [rad]
         naca = ht['airfoil']
-        a_zl_ht = - int(naca[0])
+        a_zl_ht = - 1.1 * int(naca[0])
         c_l_0_ht = self.c_l_alpha_ht * s_ht / s_w * (deg2rad(ht['incidence']) - deg2rad(a_zl_ht) - epsilon)  # []
         c_l_0 = c_l_0_w + c_l_0_ht  # []
         return c_l_0
@@ -116,6 +116,7 @@ class Aircraft:
         s_ht = ht['planform']  # [ft^2]
         vt = self.plane['vertical']
         s_vt = vt['planform']  # [ft^2]
+        b_vt = span(vt['aspect_ratio'], s_vt, mirror=0)
 
         c_bar = self.c_bar
         cg_bar = self.plane['weight']['cg'][0] / c_bar  # []
@@ -124,9 +125,9 @@ class Aircraft:
         x_ac_ht_bar = self.x_ac_ht / c_bar  # []
 
         naca = wing['airfoil']
-        a_zl = - int(naca[0])
+        a_zl = - 1.1 * int(naca[0])
         naca = ht['airfoil']
-        a_zl_ht = - int(naca[0])
+        a_zl_ht = - 1.1 * int(naca[0])
         c_l_0_w = self.c_l_alpha_w * (deg2rad(wing['incidence']) - deg2rad(a_zl))  # []
         c_m_0_w = c_l_0_w * (cg_bar - x_ac_w_bar)
         epsilon = 2 * c_l_0_w / (pi * wing['aspect_ratio'])  # [rad]
@@ -134,7 +135,7 @@ class Aircraft:
 
         z_w = (z_cg - wing['waterline']) / c_bar
         z_ht = (z_cg - ht['waterline']) / c_bar
-        z_vt = (z_cg - vt['waterline']) / c_bar
+        z_vt = (z_cg - (vt['waterline'] + b_vt / 2)) / c_bar
         z_f = (z_cg - self.plane['fuselage']['height'] / 2) / c_bar
 
         c_m_0_w_d = - LiftingSurface(wing).parasite_drag(self.mach, altitude) * z_w

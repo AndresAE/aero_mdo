@@ -1,11 +1,12 @@
 from numpy import array, arctan, cos, linalg, ones, sin, sqrt, rad2deg
 from scipy.interpolate import interp2d
-from src.common.rotations import body_to_wind
+from src.common.rotations import body_to_wind, translate_mrc
 from src.modeling.aerodynamics import dynamic_pressure
 from src.common import Atmosphere
 from src.common.report_tools import load_aero_model
 from src.modeling import Aircraft, Propulsion
 from src.modeling.trapezoidal_wing import mac, span
+# import os
 
 
 def c_f_m(aircraft, x, u):
@@ -32,6 +33,11 @@ def c_f_m(aircraft, x, u):
     q_bar = dynamic_pressure(mach, altitude)  # [psf]
     s = aircraft['wing']['planform']  # [ft2]
 
+    # cwd = os.getcwd()
+    # path = cwd + '/src/airplanes/' + aircraft['name'] + '/output/model.txt'
+    # if os.path.exists(path):
+    #     c_aero = nonlinear_aero(aircraft, x, u)
+    # else:
     c_aero = linear_aero(aircraft, x, u)
 
     c = array([- c_aero[0], c_aero[1], - c_aero[2], c_aero[3]*b, c_aero[4]*c_bar, c_aero[5]*b])*q_bar*s
@@ -99,7 +105,7 @@ def linear_aero(aircraft, x, u):
 
     ac = Aircraft(aircraft, mach)
     cd = (ac.c_d_zero(altitude) +
-          ((ac.c_l_alpha() * alpha +
+          ((ac.c_l_zero() + ac.c_l_alpha() * alpha +
               ac.c_l_alpha_dot() * alpha_dot +
               ac.c_l_pitch_rate() * q_hat +
               ac.c_l_delta_elevator() * d_elevator) ** 2) /
@@ -146,7 +152,9 @@ def nonlinear_aero(aircraft, x, u):
     alpha = rad2deg(arctan(x[2] / x[0]))
     beta = rad2deg(arctan(x[1] / x[0]))
     model = load_aero_model(aircraft['name'])
-
+    s = aircraft['wing']['planform']  # [ft2]
+    cbar = mac(aircraft['wing']['aspect_ratio'], s, aircraft['wing']['taper'])  # [ft]
+    b = span(aircraft['wing']['aspect_ratio'], s)  # [ft]
     p = rad2deg(x[6])
     q = rad2deg(x[7])
     r = rad2deg(x[8])
@@ -176,4 +184,6 @@ def nonlinear_aero(aircraft, x, u):
                  float(f_r(r, mach) - f_bas(0, mach)))
     ac = Aircraft(aircraft, mach)
     c_aero = (array(c) + array([ac.c_d_zero(altitude), 0, 0, 0, 0, 0]))
-    return c_aero
+    c_aero_cg = translate_mrc(model['mrc'], aircraft['weight']['cg'], c_aero * array([1, 1, 1, -b, cbar, -b]))
+    c_aero_cg = c_aero_cg * array([1, 1, 1, -1 / b, 1 / cbar, -1 / b])
+    return c_aero_cg

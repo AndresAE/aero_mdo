@@ -134,23 +134,25 @@ def trim(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
     # automate limits
     # add nonzero derivatives
     # make generic
-    lim = ([-80/57.3, 80/57.3], [0.01, 1], [-80/57.3, 80/57.3])
-    x0 = array([-0.001, 0.4, 0.001])
+    lim_ele = aircraft['horizontal']['control_2']['limits']
+    lim = ([-5/57.3, aircraft['wing']['alpha_stall']/57.3], [deg2rad(lim_ele[0]), deg2rad(lim_ele[1])])
+    x0 = array([0.01, -0.01])
     u_out = minimize(obj, x0, bounds=lim, tol=tol,
-                     constraints=({'type': 'eq', 'fun': alpha_stab_throttle,
+                     constraints=({'type': 'eq', 'fun': alpha_stab,
                                   'args': (aircraft, speed, altitude, gamma, n)}),
                      options=({'maxiter': 200}))
-    return u_out
+    c = rad2deg(u_out['x'])
+    return c
 
 
 def obj(x):
-    out = sum(abs(x))
+    out = x[1]
     return out
 
 
-def alpha_stab_throttle(x, aircraft, speed, altitude, gamma, n):
-    u = array([0, x[0], 0, x[1]])
-    x = array([speed * cos(x[2]), 0, speed * sin(x[2]), 0, x[2] + deg2rad(gamma), 0, 0, 0, 0, 0, 0, altitude])
+def alpha_stab(x, aircraft, speed, altitude, gamma, n):
+    u = array([0, x[1], 0, 0.01])
+    x = array([speed * cos(x[0]), 0, speed * sin(x[0]), 0, x[0] + deg2rad(gamma), 0, 0, 0, 0, 0, 0, altitude])
     aircraft['weight']['weight'] = aircraft['weight']['weight'] * n
     dxdt = c_f_m(aircraft, x, u)
     return sqrt(sum(dxdt ** 2)) / 1000

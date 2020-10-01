@@ -109,7 +109,7 @@ def run_avl(aircraft, mach, alpha, beta, p, q, r, u, iplot=0):
     yaw_rate = deg2rad(r)  # [rad/s]
     d_aileron = u[0]  # deg
     d_elevator = u[1]  # deg
-    d_rudder = u[2]  # deg
+    d_rudder = -u[2]  # deg
     gains = [-1, 1, 1]
 
     wing = aircraft['wing']
@@ -208,7 +208,7 @@ def run_avl(aircraft, mach, alpha, beta, p, q, r, u, iplot=0):
                            alpha=alpha, beta=beta,
                            aileron=gains[0] * d_aileron, elevator=gains[1] * d_elevator, rudder=gains[2] * d_rudder,
                            roll_rate=roll_rate * wing_span/(2 * mach * a),
-                           pitch_rate=pitch_rate * wing_span/(2 * mach * a),
+                           pitch_rate=pitch_rate * wing_mac/(2 * mach * a),
                            yaw_rate=yaw_rate * wing_span/(2 * mach * a))
     session = avl.Session(geometry=aircraft, cases=[simple_case])
 
