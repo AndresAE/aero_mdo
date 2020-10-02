@@ -12,40 +12,41 @@ class Fuselage:
     def cross_section(self, tol=10e-3):
         """return far 14.25 compliant fuselage cross section parameters."""
         fus = self.plane['fuselage']
-        w = fus['seats_row'] * unit_conversions.far_25_seat_width() + unit_conversions.far_25_aisle_width()
+        n_aisle = ceil(fus['seats_row'] / 6)
+        w = fus['seats_row'] * unit_conversions.far_25_seat_width() + n_aisle * unit_conversions.far_25_aisle_width()
         ha = unit_conversions.far_25_aisle_height()
         hs = unit_conversions.far_25_head_room()
 
-        def major_axis(x):
-            ma = ha - x[0]
-            return ma
-
         def obj(x):
-            a_obj = major_axis(x)
+            a_obj = x[0]
             b_obj = x[1]
             cir = 2 * pi * ((a_obj + b_obj) / 2) ** 0.5
             return cir
 
         def cabin_constraint(x):
-            a_c = major_axis(x)
+            a_c = x[0]
             b_c = x[1]
             x_1 = w / 2
-            y_1 = -x[0]
-            # x_2 = x_1
-            # y_2 = hs - x[0]
-            out_1 = ((x_1 / b_c) ** 2) + ((y_1 / a_c) ** 2)
-            # out_2 = ((x_2 / b_c) ** 2) + ((y_2 / a_c) ** 2)
-            return out_1 - 1
+            y_1 = -x[2]
+            x_2 = x_1
+            y_2 = hs - x[2]
+            x_3 = 0
+            y_3 = ha - x[2]
+            out_1 = ((x_1 / b_c) ** 2) + ((y_1 / a_c) ** 2) - 1
+            out_2 = ((x_2 / b_c) ** 2) + ((y_2 / a_c) ** 2) - 1
+            out_3 = ((x_3 / b_c) ** 2) + ((y_3 / a_c) ** 2) - 1
+            out = array([-out_1, -out_2, -out_3])
+            return out
 
-        lim = ([0.01, ha], [1, w * 2])
-        x0 = array([1, 1])
+        lim = ([0.01, 2 * ha], [0.01, w * 2], [0, ha])
+        x0 = array([1, 1, 1])
         u_out = minimize(obj, x0, bounds=lim, tol=tol,
-                         constraints=({'type': 'eq', 'fun': cabin_constraint}),
+                         constraints=({'type': 'ineq', 'fun': cabin_constraint}),
                          options=({'maxiter': 200}))
         c = u_out['x']
-        a = major_axis(c)
+        a = c[0]
         b = c[1]
-        dy = c[0]
+        dy = c[2]
         return a, b, dy, w
 
     def far_25_length(self):
