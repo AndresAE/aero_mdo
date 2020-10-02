@@ -3,7 +3,7 @@ def electric_hp_lb():
 
 
 def far_25_aisle_height():
-    return 76 / 12  # [ft]
+    return 80 / 12  # [ft]
 
 
 def far_25_aisle_width():
@@ -52,6 +52,18 @@ def m2ft():
 
 def paint_density():
     return 0.0533   # [lb / ft2]
+
+
+def type_1_exit_width():
+    return 24 / 12  # [ft]
+
+
+def type_2_exit_width():
+    return 20 / 12  # [ft]
+
+
+def type_3_exit_width():
+    return 20 / 12  # [ft]
 
 
 def watt2lbft_s():

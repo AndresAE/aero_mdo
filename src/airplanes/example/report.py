@@ -1,12 +1,12 @@
 from matplotlib import pyplot as plt
-from numpy import arctan, array, cos, deg2rad, linspace, rad2deg, sin, zeros
+from numpy import arctan, array, cos, deg2rad, linspace, sin, zeros
 from src.common import Atmosphere, Earth
 from src.common.report_tools import create_output_dir, plot_or_save
 from src.analysis.lateral_directional import directional_stability, lateral_stability, dutch_roll_mode, plot_dr, \
     roll_mode, spiral_mode
 from src.analysis.longitudinal import aircraft_range, balanced_field_length, maneuvering, short_period_mode, plot_sp, \
     static_margin, specific_excess_power
-from src.analysis.trim import trim_aileron, trim_aileron_rudder, trim_alpha_de, trim
+from src.analysis.trim import trim_aileron_nonlinear, trim_aileron_rudder_nonlinear, trim_alpha_de_nonlin
 g = Earth(0).gravity()  # f/s2
 show_plot = 0
 save_plot = 1
@@ -23,7 +23,7 @@ def report_sweep(plane, requirements, name=''):
     # Requirements
     n_z = [requirements['loads']['n_z'][0], 1, requirements['loads']['n_z'][1]]  # [g]
     crosswind = requirements['stability_and_control']['crosswind']  # [ft/s]
-    p = requirements['stability_and_control']['roll_rate']  # [deg/s]
+    p = deg2rad(requirements['stability_and_control']['roll_rate'])  # [rad/s]
     h_to = requirements['performance']['to_altitude']  # [ft]
 
     # set arrays
@@ -51,14 +51,14 @@ def report_sweep(plane, requirements, name=''):
         for mach_i in machs:
             a = Atmosphere(alt_i).speed_of_sound()
             v = mach_i * a
-            trim_out = trim(plane, v, alt_i, 0)
+            trim_out = trim_alpha_de_nonlin(plane, v, alt_i, 0)
             aoa = deg2rad(trim_out[0])  # rad
             u = v * cos(aoa)  # ft/s
             w = v * sin(aoa)  # ft/s
             de = deg2rad(trim_out[1])  # rad
             x_0 = array([float(u), 0.0, float(w), 0.0, float(aoa), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, alt_i])
             u_0 = array([0.0, float(de), 0.0, 1])
-            beta = rad2deg(arctan(crosswind / v))
+            beta = arctan(crosswind / v)
 
             # stability and control
             omega, zeta_sp[i_alt, i_mach], cap[i_alt, i_mach] = short_period_mode(plane, x_0, u_0)
@@ -68,10 +68,10 @@ def report_sweep(plane, requirements, name=''):
             sm[i_alt, i_mach] = static_margin(plane, mach_i)
             c_n[i_alt, i_mach] = directional_stability(plane, mach_i, aoa)
             c_r[i_alt, i_mach] = lateral_stability(plane, mach_i, aoa)
-            out_beta = trim_aileron_rudder(plane, v, alt_i, float(aoa), beta, 0, 0)
+            out_beta = trim_aileron_rudder_nonlinear(plane, v, alt_i, float(aoa), beta, 0, 0)
             dr_beta[i_alt, i_mach] = out_beta[1]
             da_beta[i_alt, i_mach] = out_beta[0]
-            out_p = trim_aileron(plane, v, alt_i, p)
+            out_p = trim_aileron_nonlinear(plane, v, alt_i, p)
             da_roll[i_alt, i_mach] = out_p
 
             # performance

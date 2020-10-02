@@ -17,7 +17,7 @@ plane = {
         'n_controls': 4,  # []
         'control_1': {
             'name': 'aileron_l',
-            'limits': [-15, 15],  # [deg]
+            'limits': [-30, 30],  # [deg]
             'cf_c': 0.25,
             'b_1': -1,
             'b_2': -0.75,
@@ -38,7 +38,7 @@ plane = {
         },
         'control_4': {
             'name': 'aileron_r',
-            'limits': [-15, 15],  # [deg]
+            'limits': [-30, 30],  # [deg]
             'cf_c': 0.25,
             'b_1': 0.75,
             'b_2': 1,
@@ -85,7 +85,7 @@ plane = {
         'n_controls': 1,
         'control_1': {
             'name': 'rudder',
-            'limits': [-15, 15],  # [deg]
+            'limits': [-30, 30],  # [deg]
             'cf_c': 0.3,
             'b_1': 0.1,
             'b_2': 1,
@@ -99,7 +99,8 @@ plane = {
         'l_cockpit': 8,  # [ft]
         'theta_cockpit': 45,  # [deg]
         'theta_tailstrike': 12,  # [deg]
-        'pax': 20
+        'pax': 80,
+        'seats_row': 4,
     },
     'weight': {
         'weight': 30000,  # [lb]

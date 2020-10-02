@@ -1,7 +1,8 @@
 """Trim aircraft longitudinally."""
 from numpy import array, cos, deg2rad, interp, linalg, ones, rad2deg, sin, sqrt
-from scipy.optimize import minimize
+from scipy.optimize import minimize, Bounds
 from src.common import Atmosphere
+from src.common.rotations import body_to_wind
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import c_f_m, landing_gear_loads
 from src.modeling.trapezoidal_wing import mac, span
@@ -15,7 +16,6 @@ def trim_aileron(aircraft, v, altitude, p):
     mach = v / a
     b = span(aircraft['wing']['aspect_ratio'], aircraft['wing']['planform'])
     k = b / (2 * v)
-    p = deg2rad(p)
     c_l_p = Aircraft(aircraft, mach).c_r_roll_rate()  # []
     c_l_da = Aircraft(aircraft, mach).c_r_delta_aileron()  # []
     da = - c_l_p * p * k / c_l_da
@@ -29,9 +29,6 @@ def trim_aileron_rudder(aircraft, v, altitude, alpha, beta, p, r):
     mach = v / a
     b = span(aircraft['wing']['aspect_ratio'], aircraft['wing']['planform'])
     k = b / (2 * v)
-    beta = deg2rad(beta)
-    p = deg2rad(p)
-    r = deg2rad(r)
     c_l_b = Aircraft(aircraft, mach).c_r_beta(alpha)
     c_l_p = Aircraft(aircraft, mach).c_r_roll_rate()  # []
     c_l_r = Aircraft(aircraft, mach).c_r_yaw_rate(alpha)  # []
@@ -130,10 +127,66 @@ def trim_vs(aircraft, altitude, gamma, n=1):
 
 
 # Nonlinear trims
-def trim(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
-    # automate limits
-    # add nonzero derivatives
-    # make generic
+def trim_aileron_nonlinear(aircraft, speed, altitude, roll_rate, tol=1e-1):
+    def obj(x):
+        out = abs(x)
+        return out
+
+    def aileron(x, plane, v, h, p):
+        u = array([x[0], 0, 0, 0.01])
+        x = array([v, 0, 0, 0, 0, 0, p, 0, 0, 0, 0, h])
+        dxdt = c_f_m(plane, x, u)
+        return sqrt(sum(dxdt ** 2)) / 1000
+
+    lim_ail = aircraft['wing']['control_4']['limits']
+    lim = Bounds(deg2rad(lim_ail[0]), deg2rad(lim_ail[1]))
+    x0 = array([0.0])
+    u_out = minimize(obj, x0, bounds=lim, tol=tol,
+                     constraints=({'type': 'eq', 'fun': aileron,
+                                  'args': (aircraft, speed, altitude, roll_rate)}),
+                     options=({'maxiter': 200}))
+    c = rad2deg(u_out['x'])
+    return c
+
+
+def trim_aileron_rudder_nonlinear(aircraft, speed, altitude, alpha, beta, roll_rate, yaw_rate, tol=1e-1):
+    def obj(x):
+        out = sum(abs(x))
+        return out
+
+    def aileron_rudder(x, plane, v, h, aoa, aos, p, r):
+        u = array([x[0], 0, x[1], 0.01])
+        b2w = body_to_wind(aoa, aos)
+        v_b = linalg.inv(b2w) @ array([v, 0, 0])
+        x = array([v_b[0], v_b[1], v_b[2], 0, aoa, 0, p, 0, r, 0, 0, h])
+        dxdt = c_f_m(plane, x, u)
+        return sqrt(sum(dxdt ** 2)) / 1000
+
+    lim_ail = aircraft['wing']['control_4']['limits']
+    lim_rud = aircraft['vertical']['control_1']['limits']
+    lim = ([deg2rad(lim_ail[0]), deg2rad(lim_ail[1])], [deg2rad(lim_rud[0]), deg2rad(lim_rud[1])])
+    x0 = array([0.0, 0.0])
+    u_out = minimize(obj, x0, bounds=lim, tol=tol,
+                     constraints=({'type': 'eq', 'fun': aileron_rudder,
+                                  'args': (aircraft, speed, altitude, alpha, beta, roll_rate, yaw_rate)}),
+                     options=({'maxiter': 200}))
+    c = rad2deg(u_out['x'])
+    return c
+
+
+def trim_alpha_de_nonlin(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
+    """trim nonlinear aircraft with angle of attack and elevator."""
+    def obj(x):
+        out = x[1]
+        return out
+
+    def alpha_stab(x, plane, v, h, g, n_z):
+        u = array([0, x[1], 0, 0.01])
+        x = array([v * cos(x[0]), 0, v * sin(x[0]), 0, x[0] + deg2rad(g), 0, 0, 0, 0, 0, 0, h])
+        plane['weight']['weight'] = plane['weight']['weight'] * n_z
+        dxdt = c_f_m(plane, x, u)
+        return sqrt(sum(dxdt ** 2)) / 1000
+
     lim_ele = aircraft['horizontal']['control_2']['limits']
     lim = ([-5/57.3, aircraft['wing']['alpha_stall']/57.3], [deg2rad(lim_ele[0]), deg2rad(lim_ele[1])])
     x0 = array([0.01, -0.01])
@@ -143,16 +196,3 @@ def trim(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
                      options=({'maxiter': 200}))
     c = rad2deg(u_out['x'])
     return c
-
-
-def obj(x):
-    out = x[1]
-    return out
-
-
-def alpha_stab(x, aircraft, speed, altitude, gamma, n):
-    u = array([0, x[1], 0, 0.01])
-    x = array([speed * cos(x[0]), 0, speed * sin(x[0]), 0, x[0] + deg2rad(gamma), 0, 0, 0, 0, 0, 0, altitude])
-    aircraft['weight']['weight'] = aircraft['weight']['weight'] * n
-    dxdt = c_f_m(aircraft, x, u)
-    return sqrt(sum(dxdt ** 2)) / 1000
