@@ -1,5 +1,6 @@
 from numpy import array, ceil, cos, deg2rad, pi
 from src.common import Atmosphere, Earth, unit_conversions
+from src.modeling import LiftingSurface
 from src.modeling.Propulsion import propeller
 from src.modeling.trapezoidal_wing import span, sweep_x
 g = Earth(0).gravity()  # [f/s2]
@@ -55,27 +56,51 @@ class MassProperties:
         n = max(abs(array(requirements['loads']['n_z'])))
 
         res = 10
-        w_fixed = (avionics_weight(aircraft, r) +
-                   cargo_weight(aircraft) +
-                   electrical_weight(aircraft) +
-                   fuselage_weight(aircraft) +
-                   paint(aircraft) +
-                   passenger_weight(aircraft) +
-                   propulsion_weight(aircraft) +
-                   aircraft['propulsion']['fuel_mass'] * g)
+        w_avi = avionics_weight(aircraft, r)
+        w_car = cargo_weight(aircraft)
+        w_ele = electrical_weight(aircraft)
+        w_fus = fuselage_weight(aircraft)
+        w_pnt = paint(aircraft)
+        w_pax = passenger_weight(aircraft)
+        w_prp = propulsion_weight(aircraft)
+        w_ful = aircraft['propulsion']['fuel_mass'] * g
+        w_fixed = w_avi + w_car + w_ele + w_fus + w_pnt + w_pax + w_prp + w_ful
+        w_fcs = 0
+        w_ht = 0
+        w_mg = 0
+        w_ng = 0
+        w_vt = 0
+        w_w = 0
         while abs(res) > tol:
-            w_iter = (fcs_weight(aircraft, mtow, mach) +
-                      ht_weight(aircraft, mtow) +
-                      main_gear_weight(aircraft, mtow) +
-                      nose_gear_weight(aircraft, mtow) +
-                      vt_weight(aircraft, mtow) +
-                      wing_weight(aircraft, mtow, mach, n))
+            w_fcs = fcs_weight(aircraft, mtow, mach)
+            w_ht = ht_weight(aircraft, mtow)
+            w_mg = main_gear_weight(aircraft, mtow)
+            w_ng = nose_gear_weight(aircraft, mtow)
+            w_vt = vt_weight(aircraft, mtow)
+            w_w = wing_weight(aircraft, mtow, mach, n)
+            w_iter = w_fcs + w_ht + w_mg + w_ng + w_vt + w_w
             mtow_out = w_iter + w_fixed
             res = mtow - mtow_out
             mtow = mtow_out
+        p_prp = array([aircraft['wing']['station'], 0, aircraft['wing']['waterline']])
+        p_w = array([LiftingSurface(aircraft['wing']).aerodynamic_center(c=0.5), aircraft['wing']['buttline'],
+                     aircraft['wing']['waterline']])
+        p_ht = array([LiftingSurface(aircraft['horizontal']).aerodynamic_center(c=0.5),
+                      aircraft['horizontal']['buttline'], aircraft['horizontal']['waterline']])
+        p_vt = array([LiftingSurface(aircraft['vertical']).aerodynamic_center(c=0.5),
+                      aircraft['vertical']['buttline'], aircraft['vertical']['waterline']])
+        p_mg = array([aircraft['landing_gear']['main'][0], 0, aircraft['landing_gear']['main'][2] / 2])
+        p_ng = array([aircraft['landing_gear']['nose'][0], aircraft['landing_gear']['nose'][1],
+                      aircraft['landing_gear']['nose'][2] / 2])
+        p_fus = array([aircraft['fuselage']['length'] / 2, 0, aircraft['fuselage']['width']])
+        w_r = (p_w * (w_fcs + w_w + w_ful) + p_prp * w_prp +
+               p_ht * w_ht + p_vt * w_vt + p_mg * w_mg + p_ng * w_ng +
+               p_fus * (w_fus + w_avi + w_ele + w_pnt + w_pax))
+        cg = w_r / mtow
+
         # j = inertia tensor
         # cg = [x, y, z]
-        return mtow
+        return mtow, cg
 
 
 def avionics_weight(aircraft, r):

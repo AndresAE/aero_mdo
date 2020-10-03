@@ -1,11 +1,11 @@
 from control import damp, StateSpace
 from matplotlib import pyplot as plt
-from numpy import log, max, min, unique, pi, sum, sqrt, zeros
+from numpy import array, cos, gradient, log, max, mean, min, unique, pi, sin, sum, sqrt, zeros
 from src.analysis.trim import trim_alpha_de_throttle, trim_vr, trim_vs
 from src.common import Atmosphere, Earth
 from src.common.equations_of_motion import nonlinear_eom, nonlinear_eom_to_ss
 from src.modeling.Aircraft import Aircraft
-from src.modeling.force_model import c_f_m, landing_gear_loads
+from src.modeling.force_model import c_f_m, landing_gear_loads, linear_aero
 g = Earth(0).gravity()  # f/s2
 
 
@@ -218,6 +218,24 @@ def static_margin(plane, mach):
     c_l_a = Aircraft(plane, mach).c_l_alpha()
     sm = -c_m_a / c_l_a * 100
     return sm
+
+
+def static_margin_nonlinear(plane, mach, altitude, alpha, de, delta=0.01):
+    """return longitudinal static margin using nonlinear model."""
+    u = [0, de, 0, 0.01]
+    alphas = alpha + array([-delta, 0, delta])
+    a = Atmosphere(altitude).speed_of_sound()
+    v = a * mach
+    cl = []
+    cm = []
+    for ai in alphas:
+        x = [v * cos(ai), 0, v * sin(ai), 0, ai, 0, 0, 0, 0, 0, 0, altitude]
+        cfm = linear_aero(plane, x, u)
+        cl.append(cfm[2])
+        cm.append(cfm[4])
+    cla = mean(gradient(cl, alphas))
+    cma = mean(gradient(cm, alphas))
+    return - cma / cla * 100
 
 
 def takeoff_ground_roll(aircraft, x_0, u_0):

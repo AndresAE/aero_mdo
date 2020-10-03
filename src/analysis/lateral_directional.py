@@ -1,9 +1,11 @@
 from control import damp, StateSpace
 from matplotlib import pyplot as plt
-from numpy import log, max, min, unique, real
-from src.common import Earth
+from numpy import array, gradient, linalg, log, max, mean, min, unique, real
+from src.common import Earth, Atmosphere
 from src.common.equations_of_motion import nonlinear_eom_to_ss
+from src.common.rotations import body_to_wind
 from src.modeling.Aircraft import Aircraft
+from src.modeling.force_model import linear_aero
 g = Earth(0).gravity()  # f/s2
 
 
@@ -21,6 +23,26 @@ def dutch_roll_mode(aircraft, x_0, u_0):
 def lateral_stability(plane, mach, alpha):
     c_r_b = Aircraft(plane, mach).c_r_beta(alpha)
     return c_r_b
+
+
+def latdir_stability_nonlinear(plane, mach, altitude, alpha, de, delta=0.01):
+    """return lateral directional stability derivatives using nonlinear model."""
+    u = [0, de, 0, 0.01]
+    betas = array([-delta, 0, delta])
+    a = Atmosphere(altitude).speed_of_sound()
+    v = a * mach
+    cmr = []
+    cmy = []
+    for bi in betas:
+        b2w = body_to_wind(alpha, bi)
+        uvw = linalg.inv(b2w) @ array([v, 0, 0])
+        x = [uvw[0], uvw[1], uvw[2], 0, alpha, 0, 0, 0, 0, 0, 0, altitude]
+        cfm = linear_aero(plane, x, u)
+        cmr.append(cfm[3])
+        cmy.append(cfm[5])
+    cmr_b = mean(gradient(cmr, betas))
+    cmy_b = mean(gradient(cmy, betas))
+    return cmr_b, cmy_b
 
 
 def latdir_modes(aircraft, x_0, u_0):

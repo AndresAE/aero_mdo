@@ -1,5 +1,5 @@
 """Trim aircraft longitudinally."""
-from numpy import array, cos, deg2rad, interp, linalg, ones, rad2deg, sin, sqrt
+from numpy import array, cos, deg2rad, linalg, ones, rad2deg, sin, sqrt
 from scipy.optimize import minimize, Bounds
 from src.common import Atmosphere
 from src.common.rotations import body_to_wind
@@ -94,18 +94,6 @@ def trim_alpha_de_throttle(aircraft, speed, altitude, gamma, n=1):
     return c
 
 
-def trim_vr(aircraft, altitude, u_0):
-    v = [5 * x for x in range(1, 100)]
-    out = []
-    for vi in v:
-        x = array([vi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, altitude])
-        c = c_f_m(aircraft, x, u_0)
-        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x, c)
-        out.append(float(normal_loads[0]))
-    v_r = interp(0, out, v)
-    return v_r
-
-
 def trim_vs(aircraft, altitude, gamma, n=1):
     """trim aircraft with angle of attack and elevator"""
     rho = Atmosphere(altitude).air_density()  # [slug / ft^3]
@@ -128,38 +116,39 @@ def trim_vs(aircraft, altitude, gamma, n=1):
 
 # Nonlinear trims
 def trim_aileron_nonlinear(aircraft, speed, altitude, roll_rate, tol=1e-1):
+    """trim with aileron, nonlinear."""
     def obj(x):
         out = abs(x)
         return out
 
-    def aileron(x, plane, v, h, p):
+    def aileron(x):
         u = array([x[0], 0, 0, 0.01])
-        x = array([v, 0, 0, 0, 0, 0, p, 0, 0, 0, 0, h])
-        dxdt = c_f_m(plane, x, u)
+        x = array([speed, 0, 0, 0, 0, 0, roll_rate, 0, 0, 0, 0, altitude])
+        dxdt = c_f_m(aircraft, x, u)
         return sqrt(sum(dxdt ** 2)) / 1000
 
     lim_ail = aircraft['wing']['control_4']['limits']
     lim = Bounds(deg2rad(lim_ail[0]), deg2rad(lim_ail[1]))
     x0 = array([0.0])
     u_out = minimize(obj, x0, bounds=lim, tol=tol,
-                     constraints=({'type': 'eq', 'fun': aileron,
-                                  'args': (aircraft, speed, altitude, roll_rate)}),
+                     constraints=({'type': 'eq', 'fun': aileron}),
                      options=({'maxiter': 200}))
     c = rad2deg(u_out['x'])
     return c
 
 
 def trim_aileron_rudder_nonlinear(aircraft, speed, altitude, alpha, beta, roll_rate, yaw_rate, tol=1e-1):
+    """trim with aileron and rudder, nonlinear."""
     def obj(x):
         out = sum(abs(x))
         return out
 
-    def aileron_rudder(x, plane, v, h, aoa, aos, p, r):
+    def aileron_rudder(x):
         u = array([x[0], 0, x[1], 0.01])
-        b2w = body_to_wind(aoa, aos)
-        v_b = linalg.inv(b2w) @ array([v, 0, 0])
-        x = array([v_b[0], v_b[1], v_b[2], 0, aoa, 0, p, 0, r, 0, 0, h])
-        dxdt = c_f_m(plane, x, u)
+        b2w = body_to_wind(alpha, beta)
+        v_b = linalg.inv(b2w) @ array([speed, 0, 0])
+        x = array([v_b[0], v_b[1], v_b[2], 0, alpha, 0, roll_rate, 0, yaw_rate, 0, 0, altitude])
+        dxdt = c_f_m(aircraft, x, u)
         return sqrt(sum(dxdt ** 2)) / 1000
 
     lim_ail = aircraft['wing']['control_4']['limits']
@@ -167,32 +156,76 @@ def trim_aileron_rudder_nonlinear(aircraft, speed, altitude, alpha, beta, roll_r
     lim = ([deg2rad(lim_ail[0]), deg2rad(lim_ail[1])], [deg2rad(lim_rud[0]), deg2rad(lim_rud[1])])
     x0 = array([0.0, 0.0])
     u_out = minimize(obj, x0, bounds=lim, tol=tol,
-                     constraints=({'type': 'eq', 'fun': aileron_rudder,
-                                  'args': (aircraft, speed, altitude, alpha, beta, roll_rate, yaw_rate)}),
+                     constraints=({'type': 'eq', 'fun': aileron_rudder}),
                      options=({'maxiter': 200}))
     c = rad2deg(u_out['x'])
     return c
 
 
-def trim_alpha_de_nonlin(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
+def trim_alpha_de_nonlinear(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
     """trim nonlinear aircraft with angle of attack and elevator."""
     def obj(x):
         out = x[1]
         return out
 
-    def alpha_stab(x, plane, v, h, g, n_z):
+    def alpha_stab(x):
         u = array([0, x[1], 0, 0.01])
-        x = array([v * cos(x[0]), 0, v * sin(x[0]), 0, x[0] + deg2rad(g), 0, 0, 0, 0, 0, 0, h])
-        plane['weight']['weight'] = plane['weight']['weight'] * n_z
-        dxdt = c_f_m(plane, x, u)
-        return sqrt(sum(dxdt ** 2)) / 1000
+        x = array([speed * cos(x[0]), 0, speed * sin(x[0]), 0, x[0] + deg2rad(gamma), 0, 0, 0, 0, 0, 0, altitude])
+        aircraft['weight']['weight'] = aircraft['weight']['weight'] * n
+        cfm = c_f_m(aircraft, x, u)
+        return abs(cfm[2]) + abs(cfm[4])
 
     lim_ele = aircraft['horizontal']['control_2']['limits']
     lim = ([-5/57.3, aircraft['wing']['alpha_stall']/57.3], [deg2rad(lim_ele[0]), deg2rad(lim_ele[1])])
     x0 = array([0.01, -0.01])
     u_out = minimize(obj, x0, bounds=lim, tol=tol,
-                     constraints=({'type': 'eq', 'fun': alpha_stab,
-                                  'args': (aircraft, speed, altitude, gamma, n)}),
+                     constraints=({'type': 'eq', 'fun': alpha_stab}),
                      options=({'maxiter': 200}))
     c = rad2deg(u_out['x'])
+    return c
+
+
+def trim_vr(aircraft, altitude, u_0, tol=1e-1):
+    """return nose unstick speed."""
+    def obj(x):
+        out = x[0]
+        return out
+
+    def v_stab(x):
+        x = array([x[0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, altitude])
+        c = c_f_m(aircraft, x, u_0)
+        c_t, c_g, normal_loads = landing_gear_loads(aircraft, x, c)
+        return float(normal_loads[0])
+
+    lim = Bounds(10, 500)
+    x0 = array([10])
+    u_out = minimize(obj, x0, bounds=lim, tol=tol,
+                     constraints=({'type': 'eq', 'fun': v_stab}),
+                     options=({'maxiter': 200}))
+    return float(u_out['x'])
+
+
+def trim_vs_nonlinear(aircraft, altitude, gamma, n=1, tol=1e-1):
+    """trim nonlinear aircraft with speed and elevator."""
+    alpha = deg2rad(aircraft['wing']['alpha_stall'])
+
+    def obj(x):
+        out = x[1]
+        return out
+
+    def v_stab(x):
+        u = array([0, x[0], 0, 0.01])
+        x_in = array([x[1] * cos(alpha), 0, x[1] * sin(alpha), 0, alpha + deg2rad(gamma), 0, 0, 0, 0, 0, 0, altitude])
+        aircraft['weight']['weight'] = aircraft['weight']['weight'] * n
+        cfm = c_f_m(aircraft, x_in, u)
+        return abs(cfm[2]) + abs(cfm[4])
+
+    lim_ele = aircraft['horizontal']['control_2']['limits']
+    lim = ([deg2rad(lim_ele[0]), deg2rad(lim_ele[1])], [10, 500])
+    x0 = array([-0.01, 10])
+    u_out = minimize(obj, x0, bounds=lim, tol=tol,
+                     constraints=({'type': 'eq', 'fun': v_stab}),
+                     options=({'maxiter': 200}))
+    c = u_out['x']
+    c[0] = rad2deg(u_out['x'][0])
     return c

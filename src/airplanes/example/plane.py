@@ -99,8 +99,8 @@ plane = {
         'l_cockpit': 8,  # [ft]
         'theta_cockpit': 45,  # [deg]
         'theta_tailstrike': 12,  # [deg]
-        'pax': 80,
-        'seats_row': 4,
+        'pax': 20,
+        'seats_row': 2,
     },
     'weight': {
         'weight': 30000,  # [lb]

@@ -16,7 +16,7 @@ def create_output_dir(name):
 def load_aero_model(name):
     """get aero model .txt file from output directory."""
     cwd = os.getcwd()
-    path = cwd + '/src/airplanes/' + name + '/output/'
+    path = cwd + '/src/airplanes/' + name
     file = open(path + "model.txt", "r")
     contents = file.read()
     out = eval(contents)
@@ -38,7 +38,7 @@ def plot_or_save(plt, plot, save, plane_name, name):
 def save_aero_model(model, name):
     """save aero model .txt file to output directory."""
     cwd = os.getcwd()
-    path = cwd + '/src/airplanes/' + name + '/output/'
+    path = cwd + '/src/airplanes/' + name
     f = open(path + "model.txt", "w")
     f.write(str(model))
     f.close()

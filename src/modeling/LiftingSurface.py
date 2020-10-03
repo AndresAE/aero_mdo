@@ -36,12 +36,12 @@ class LiftingSurface:
         de_da = 4.44 * beta * (k_ar * k_taper * k_mr * sqrt(cos(deg2rad(sweep_25)))) ** 1.19  # []
         return de_da
 
-    def aerodynamic_center(self):
+    def aerodynamic_center(self, c=0.25):
         """return lifting surface aerodynamic center."""
         c_bar = mac(self.wing['aspect_ratio'], self.wing['planform'], self.wing['taper'])  # [ft]
         y = y_mac(self.wing['aspect_ratio'], self.wing['planform'], self.wing['taper'])  # [ft]
         x = x_mac(y, self.wing['sweep_LE'])  # [ft]
-        x_ac = self.wing['station'] + x + c_bar / 4  # [ft]
+        x_ac = self.wing['station'] + x + c_bar * c  # [ft]
         return x_ac
 
     def parasite_drag(self, mach, altitude):

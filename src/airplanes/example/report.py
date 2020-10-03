@@ -2,11 +2,11 @@ from matplotlib import pyplot as plt
 from numpy import arctan, array, cos, deg2rad, linspace, sin, zeros
 from src.common import Atmosphere, Earth
 from src.common.report_tools import create_output_dir, plot_or_save
-from src.analysis.lateral_directional import directional_stability, lateral_stability, dutch_roll_mode, plot_dr, \
-    roll_mode, spiral_mode
-from src.analysis.longitudinal import aircraft_range, balanced_field_length, maneuvering, short_period_mode, plot_sp, \
-    static_margin, specific_excess_power
-from src.analysis.trim import trim_aileron_nonlinear, trim_aileron_rudder_nonlinear, trim_alpha_de_nonlin
+from src.analysis.lateral_directional import dutch_roll_mode, latdir_stability_nonlinear, plot_dr, roll_mode, \
+    spiral_mode
+from src.analysis.longitudinal import aircraft_range, balanced_field_length, maneuvering, plot_sp, short_period_mode, \
+    specific_excess_power, static_margin_nonlinear
+from src.analysis.trim import trim_aileron_nonlinear, trim_aileron_rudder_nonlinear, trim_alpha_de_nonlinear
 g = Earth(0).gravity()  # f/s2
 show_plot = 0
 save_plot = 1
@@ -51,7 +51,7 @@ def report_sweep(plane, requirements, name=''):
         for mach_i in machs:
             a = Atmosphere(alt_i).speed_of_sound()
             v = mach_i * a
-            trim_out = trim_alpha_de_nonlin(plane, v, alt_i, 0)
+            trim_out = trim_alpha_de_nonlinear(plane, v, alt_i, 0)
             aoa = deg2rad(trim_out[0])  # rad
             u = v * cos(aoa)  # ft/s
             w = v * sin(aoa)  # ft/s
@@ -65,9 +65,10 @@ def report_sweep(plane, requirements, name=''):
             omega_dr[i_alt, i_mach], zeta_dr[i_alt, i_mach] = dutch_roll_mode(plane, x_0, u_0)
             t_2_d_sp[i_alt, i_mach] = spiral_mode(plane, x_0, u_0)
             t_roll[i_alt, i_mach] = roll_mode(plane, x_0, u_0)
-            sm[i_alt, i_mach] = static_margin(plane, mach_i)
-            c_n[i_alt, i_mach] = directional_stability(plane, mach_i, aoa)
-            c_r[i_alt, i_mach] = lateral_stability(plane, mach_i, aoa)
+            sm[i_alt, i_mach] = static_margin_nonlinear(plane, mach_i, alt_i, aoa, de)
+            c_latdir = latdir_stability_nonlinear(plane, mach_i, alt_i, aoa, de)
+            c_n[i_alt, i_mach] = c_latdir[1]
+            c_r[i_alt, i_mach] = c_latdir[0]
             out_beta = trim_aileron_rudder_nonlinear(plane, v, alt_i, float(aoa), beta, 0, 0)
             dr_beta[i_alt, i_mach] = out_beta[1]
             da_beta[i_alt, i_mach] = out_beta[0]
