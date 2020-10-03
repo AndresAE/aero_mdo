@@ -39,7 +39,7 @@ def save_aero_model(model, name):
     """save aero model .txt file to output directory."""
     cwd = os.getcwd()
     path = cwd + '/src/airplanes/' + name
-    f = open(path + "model.txt", "w")
+    f = open(path + "/model.txt", "w")
     f.write(str(model))
     f.close()
     return

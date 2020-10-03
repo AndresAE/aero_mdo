@@ -12,3 +12,4 @@ src/modeling/__pycache__/*
 scratch.*
 *output
 *.out
+model.txt
