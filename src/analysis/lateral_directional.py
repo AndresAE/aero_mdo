@@ -3,9 +3,10 @@ from matplotlib import pyplot as plt
 from numpy import array, gradient, linalg, log, max, mean, min, unique, real
 from src.common import Earth, Atmosphere
 from src.common.equations_of_motion import nonlinear_eom_to_ss
+from src.common.report_tools import model_exists
 from src.common.rotations import body_to_wind
 from src.modeling.Aircraft import Aircraft
-from src.modeling.force_model import linear_aero
+from src.modeling.force_model import linear_aero, nonlinear_aero
 g = Earth(0).gravity()  # f/s2
 
 
@@ -37,7 +38,10 @@ def latdir_stability_nonlinear(plane, mach, altitude, alpha, de, delta=0.01):
         b2w = body_to_wind(alpha, bi)
         uvw = linalg.inv(b2w) @ array([v, 0, 0])
         x = [uvw[0], uvw[1], uvw[2], 0, alpha, 0, 0, 0, 0, 0, 0, altitude]
-        cfm = linear_aero(plane, x, u)
+        if model_exists(plane['name']):
+            cfm = nonlinear_aero(plane, x, u)
+        else:
+            cfm = linear_aero(plane, x, u)
         cmr.append(cfm[3])
         cmy.append(cfm[5])
     cmr_b = mean(gradient(cmr, betas))

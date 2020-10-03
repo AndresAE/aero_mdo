@@ -12,10 +12,8 @@ Will need to add avl.exe to $PATH. A copy of avl.exe is included in this reposit
 
 # To-Do
 ## Short-Term
-Add mass properties.
-Finish MRC translation method.
+independent propulsion system masses
 ## Long-Term
 Add tests for aircraft class.
 Add constraint analysis.
-Add aircraft structure weight estimates.
 Add FEA and FTR ratio to aero model.

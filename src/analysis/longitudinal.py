@@ -4,8 +4,9 @@ from numpy import array, cos, gradient, log, max, mean, min, unique, pi, sin, su
 from src.analysis.trim import trim_alpha_de_throttle, trim_vr, trim_vs
 from src.common import Atmosphere, Earth
 from src.common.equations_of_motion import nonlinear_eom, nonlinear_eom_to_ss
+from src.common.report_tools import model_exists
 from src.modeling.Aircraft import Aircraft
-from src.modeling.force_model import c_f_m, landing_gear_loads, linear_aero
+from src.modeling.force_model import c_f_m, landing_gear_loads, linear_aero, nonlinear_aero
 g = Earth(0).gravity()  # f/s2
 
 
@@ -230,7 +231,10 @@ def static_margin_nonlinear(plane, mach, altitude, alpha, de, delta=0.01):
     cm = []
     for ai in alphas:
         x = [v * cos(ai), 0, v * sin(ai), 0, ai, 0, 0, 0, 0, 0, 0, altitude]
-        cfm = linear_aero(plane, x, u)
+        if model_exists(plane['name']):
+            cfm = nonlinear_aero(plane, x, u)
+        else:
+            cfm = linear_aero(plane, x, u)
         cl.append(cfm[2])
         cm.append(cfm[4])
     cla = mean(gradient(cl, alphas))

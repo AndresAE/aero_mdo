@@ -13,7 +13,8 @@ save_plot = 1
 
 
 # Sweep
-def report_sweep(plane, requirements, name=''):
+def report_sweep(plane, requirements):
+    name = plane['name']
     create_output_dir(name)
     machs = linspace(requirements['flight_envelope']['mach'][0],
                      requirements['flight_envelope']['mach'][1], 5)
@@ -79,7 +80,6 @@ def report_sweep(plane, requirements, name=''):
             p_s[i_alt, i_mach] = specific_excess_power(plane, x_0, u_0)
             alpha_nz[i_alt, i_mach, :], de_nz[i_alt, i_mach, :] = maneuvering(plane, mach_i, alt_i, n_z)
             r[i_alt, i_mach] = aircraft_range(plane, mach_i, alt_i)
-
             i_mach = i_mach + 1
         i_alt = i_alt + 1
 

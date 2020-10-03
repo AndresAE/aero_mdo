@@ -87,7 +87,7 @@ More text.
 
 \section{Airplanes}
 
-Your text goes here.
+An airplane is defined as a python dictionary. This dictionary should be stored in src>airplanes>"name">plane.py file. The dictionary should have the name plane. There is an example file in the src>airplanes>example directory. The plane dictionary includes many components as key value pairs. There are also nested key value pairs that indicate parent-child relationships. The plane includes a wings, a fuselage, propulsion, weights. The following sections define the ky value pairs and thier contents.
 
 \subsection{Wings}
 
@@ -128,13 +128,17 @@ More text.
 
 More text.
 
+\subsubsection{Non-Linear Trims}
+
+Various nonlinear trim routines are available in this software package. Thses are available through the scipy.optimize.minimize function. 
+
 \section{Modeling}
 
 Your text goes here.
 
 \subsection{Aerodynamics}
 
-More text.
+There are currently two aerodynamic modeling methods. The first is using DATCOM, and the latter is using the Mark Drela Athena Vortex Lattice software. Note that only lifting surfaces are modeled in AVL, other components like fuselages and langing gear are modeled with DATCOM methods. 
 
 \subsection{Athena Vortex Lattice}
 
@@ -181,6 +185,11 @@ More text.
 Douglas Wells, Bryce Horvath, Linwood McCullers. 
 \textit{TM-2017-219627 The Flight Optimization System Weights Estimation Method}. 
 NASA, Hampton, VA, 2017.
+
+\bibitem{latexcompanion} 
+McDonnell Douglas Corporation. 
+\textit{United States Air Force Stability and Control DATCOM}. 
+USAF, OH, 1977.
 \end{thebibliography}
 
 

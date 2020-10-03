@@ -3,10 +3,9 @@ from scipy.interpolate import interp2d
 from src.common.rotations import body_to_wind, translate_mrc
 from src.modeling.aerodynamics import dynamic_pressure
 from src.common import Atmosphere
-from src.common.report_tools import load_aero_model
+from src.common.report_tools import load_aero_model, model_exists
 from src.modeling import Aircraft, Propulsion
 from src.modeling.trapezoidal_wing import mac, span
-# import os
 
 
 def c_f_m(aircraft, x, u):
@@ -33,12 +32,10 @@ def c_f_m(aircraft, x, u):
     q_bar = dynamic_pressure(mach, altitude)  # [psf]
     s = aircraft['wing']['planform']  # [ft2]
 
-    # cwd = os.getcwd()
-    # path = cwd + '/src/airplanes/' + aircraft['name'] + '/output/model.txt'
-    # if os.path.exists(path):
-    #     c_aero = nonlinear_aero(aircraft, x, u)
-    # else:
-    c_aero = linear_aero(aircraft, x, u)
+    if model_exists(aircraft['name']):
+        c_aero = nonlinear_aero(aircraft, x, u)
+    else:
+        c_aero = linear_aero(aircraft, x, u)
 
     c = array([- c_aero[0], c_aero[1], - c_aero[2], c_aero[3]*b, c_aero[4]*c_bar, c_aero[5]*b])*q_bar*s
     b_2_w = body_to_wind(alpha, beta)
