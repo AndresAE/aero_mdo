@@ -204,7 +204,7 @@ def report_sweep(plane, requirements):
     plot_or_save(plt, show_plot, save_plot, name, 'roll_control')
 
     plt.figure()
-    levels = [0, 100, 500, 1000]
+    levels = linspace(0, 100000, 101)
     cs = plt.contour(machs, altitudes, p_s, levels)
     plt.clabel(cs, levels, fmt='%1.0f')
     plt.title('Specific Excess Power (fpm)')

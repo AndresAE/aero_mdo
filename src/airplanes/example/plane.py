@@ -105,7 +105,7 @@ plane = {
     'weight': {
         'weight': 30000,  # [lb]
         'inertia': [[141933, 0, 30000], [0, 221088, 0], [30000, 0, 318803]],  # [slug*ft^2]
-        'cg': [41, 0, 5]  # [ft]
+        'cg': [43, 0, 5]  # [ft]
     },
     'propulsion': {
         'n_engines': 6,
