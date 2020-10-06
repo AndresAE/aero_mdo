@@ -22,10 +22,10 @@ def master_constraint(aircraft, wing_loading, mach, altitude, n, gamma, a_x):
     return t_w
 
 
-def stall_speed(mach, h, c_l_max, n, gamma):
+def stall_speed(mach, altitude, c_l_max, n, gamma):
     """stall speed constraint equation."""
-    rho = Atmosphere(h).air_density()
-    a = Atmosphere(h).speed_of_sound()
+    rho = Atmosphere(altitude).air_density()
+    a = Atmosphere(altitude).speed_of_sound()
     v = a * mach
     q_bar = 0.5 * rho * v ** 2
     w_s = q_bar*c_l_max/(n*cos(deg2rad(gamma)))

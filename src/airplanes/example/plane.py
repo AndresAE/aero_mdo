@@ -198,6 +198,7 @@ requirements = {
     },
     'performance': {
         'bfl': 5000,  # [ft]
+        'stall_speed': 100,  # [ft/s]
         'to_altitude': 5000,  # [ft]
         'cruise_mach': 0.5,  # [ft/s]
         'cruise_altitude': 25000,  # [ft]
