@@ -2,11 +2,12 @@ from matplotlib import pyplot as plt
 from numpy import arctan, array, cos, deg2rad, linspace, sin, zeros
 from src.common import Atmosphere, Earth
 from src.common.report_tools import create_output_dir, plot_or_save
-from src.analysis.lateral_directional import dutch_roll_mode, latdir_stability_nonlinear, plot_dr, roll_mode, \
-    spiral_mode
-from src.analysis.longitudinal import aircraft_range, balanced_field_length, maneuvering, plot_sp, short_period_mode, \
-    specific_excess_power, static_margin_nonlinear
-from src.analysis.trim import trim_aileron_nonlinear, trim_aileron_rudder_nonlinear, trim_alpha_de_nonlinear
+from src.analysis.lateral_directional import dutch_roll_mode, latdir_stability_nonlinear, minimum_control_speed_air, \
+    plot_dr, roll_mode, spiral_mode
+from src.analysis.longitudinal import aircraft_range, balanced_field_length, maneuvering, maneuvering_envelope, \
+    plot_sp, short_period_mode, specific_excess_power, static_margin_nonlinear
+from src.analysis.trim import trim_aileron_nonlinear, trim_aileron_rudder_nonlinear, trim_alpha_de_nonlinear, trim_vx, \
+    trim_vy
 g = Earth(0).gravity()  # f/s2
 show_plot = 0
 save_plot = 1
@@ -44,11 +45,16 @@ def report_sweep(plane, requirements):
     da_beta = zeros((len(altitudes), len(machs)))
     da_roll = zeros((len(altitudes), len(machs)))
     r = zeros((len(altitudes), len(machs)))
+    vmc = zeros((len(altitudes), 1))
 
     # iterative methods
     i_alt = 0
     for alt_i in altitudes:
         i_mach = 0
+        # altitude iterative
+        # stability and control
+        vmc[i_alt] = minimum_control_speed_air(plane, alt_i)
+
         for mach_i in machs:
             a = Atmosphere(alt_i).speed_of_sound()
             v = mach_i * a
@@ -77,6 +83,8 @@ def report_sweep(plane, requirements):
             da_roll[i_alt, i_mach] = out_p
 
             # performance
+            trim_vx(plane, alt_i)
+            trim_vy(plane, alt_i)
             p_s[i_alt, i_mach] = specific_excess_power(plane, x_0, u_0)
             alpha_nz[i_alt, i_mach, :], de_nz[i_alt, i_mach, :] = maneuvering(plane, mach_i, alt_i, n_z)
             r[i_alt, i_mach] = aircraft_range(plane, mach_i, alt_i)
@@ -84,6 +92,9 @@ def report_sweep(plane, requirements):
         i_alt = i_alt + 1
 
     # non-iterative methods
+    maneuvering_envelope(plane, requirements, 0)
+    plot_or_save(plt, show_plot, save_plot, name, 'maneuvering_envelope')
+
     x_0 = array([float(0.01), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, h_to])
     u_0 = array([0.0, 0.0, 0.0, 1])
     balanced_field_length(plane, x_0, u_0)
@@ -222,3 +233,12 @@ def report_sweep(plane, requirements):
     plt.xlabel('Mach')
     plt.ylabel('Altitude [ft]')
     plot_or_save(plt, show_plot, save_plot, name, 'range')
+
+    plt.figure()
+    plt.plot(vmc, altitudes)
+    plt.title('Minimum Control Speed Air')
+    plt.grid(True)
+    plt.legend()
+    plt.ylabel('Altitude [ft]')
+    plt.xlabel('Vmc [ft/s]')
+    plot_or_save(plt, show_plot, save_plot, name, 'vmca')

@@ -1,6 +1,7 @@
 from control import damp, StateSpace
 from matplotlib import pyplot as plt
 from numpy import array, gradient, linalg, log, max, mean, min, unique, real
+from src.analysis.trim import trim_aileron_rudder_speed_nonlinear
 from src.common import Earth, Atmosphere
 from src.common.equations_of_motion import nonlinear_eom_to_ss
 from src.common.report_tools import model_exists
@@ -69,6 +70,20 @@ def latdir_modes(aircraft, x_0, u_0):
         t_r = float("nan")
         t_s = float("nan")
     return wn_dr, zeta_dr, t_r, t_s
+
+
+def minimum_control_speed_air(plane, altitude):
+    """return minimum control speed in air for given altitude."""
+    prop = plane['propulsion']
+    if prop['n_engines'] > 1:
+        pitch = prop['engine_1']['pitch']
+        plane['propulsion']['engine_1']['pitch'] = 0
+        c = trim_aileron_rudder_speed_nonlinear(plane, altitude, 0, 0, 0)
+        vmca = c[4]
+        plane['propulsion']['engine_1']['pitch'] = pitch
+    else:
+        vmca = 0
+    return vmca
 
 
 def plot_dr():

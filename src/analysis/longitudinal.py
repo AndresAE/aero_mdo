@@ -1,7 +1,7 @@
 from control import damp, StateSpace
 from matplotlib import pyplot as plt
-from numpy import array, cos, gradient, log, max, mean, min, unique, pi, sin, sum, sqrt, zeros
-from src.analysis.trim import trim_alpha_de_throttle, trim_vr, trim_vs
+from numpy import append, array, cos, gradient, linspace, log, max, mean, min, unique, pi, sin, sort, sqrt, sum, zeros
+from src.analysis.trim import trim_alpha_de_throttle, trim_vr, trim_vs, trim_vs_nonlinear
 from src.common import Atmosphere, Earth
 from src.common.equations_of_motion import nonlinear_eom, nonlinear_eom_to_ss
 from src.common.report_tools import model_exists
@@ -143,6 +143,43 @@ def maneuvering(aircraft, mach, altitude, n_z):
         alpha_out.append(out[0])
         de_out.append(out[1])
     return alpha_out, de_out
+
+
+def maneuvering_envelope(plane, requirements, altitude):
+    """return V-n diagram for given altitude."""
+    a = Atmosphere(altitude).speed_of_sound()
+    v_max = requirements['flight_envelope']['mach'][1] * a
+    alpha_plus = plane['wing']['alpha_stall']
+    alpha_minus = - plane['wing']['alpha_stall']
+    nz_plus = requirements['loads']['n_z'][1]
+    nz_minus = requirements['loads']['n_z'][0]
+    nz_pluss = linspace(0.1, nz_plus, 5)
+    nz_minuss = linspace(nz_minus, -0.1, 5)
+    v_plus = []
+    for inz in nz_pluss:
+        c = trim_vs_nonlinear(plane, altitude, alpha_plus, 0, n=inz)
+        v_plus.append(c[1])
+    v_minus = []
+    for inz in nz_minuss:
+        c = trim_vs_nonlinear(plane, altitude, alpha_minus, 0, n=inz)
+        v_minus.append(c[1])
+    va_plus = v_plus[-1]
+    va_minus = v_minus[0]
+    v_plus.append(0)
+    v_minus.append(0)
+    nz_pluss = append(0, nz_pluss)
+    nz_minuss = append(nz_minuss, 0)
+    plt.figure()
+    plt.plot(sort(v_plus), sort(nz_pluss), 'k')
+    plt.plot(v_minus, nz_minuss, 'k')
+    plt.plot([va_plus, v_max], [nz_plus, nz_plus], 'k')
+    plt.plot([va_minus, v_max], [nz_minus, nz_minus], 'k')
+    plt.plot([v_max, v_max], [nz_minus, nz_plus], 'k')
+    plt.grid(True)
+    plt.xlabel('V [fps]')
+    plt.ylabel('n_z [g]')
+    plt.title('V-n Diagram, %d ft' % altitude)
+    return va_plus, va_minus
 
 
 def n_per_alpha(aircraft, x_0):
