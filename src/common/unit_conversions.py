@@ -2,6 +2,18 @@ def electric_hp_lb():
     return 6
 
 
+def energy_density_av_gas():
+    return 12.22  # [kW.hr/kg]
+
+
+def energy_density_h2():
+    return 33.3  # [kW.hr/kg]
+
+
+def energy_density_jet_a():
+    return 11.94  # [kW.hr/kg]
+
+
 def far_25_aisle_height():
     return 80 / 12  # [ft]
 
