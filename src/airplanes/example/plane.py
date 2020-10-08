@@ -3,7 +3,7 @@ plane = {
     'name': 'example',
     'wing': {
         'type': 'wing',
-        'planform': 700,  # [ft^2]
+        'planform': 640,  # [ft^2]
         'aspect_ratio': 8,  # []
         'sweep_LE': 0,  # [deg]
         'taper': 0.5,  # []
@@ -46,13 +46,13 @@ plane = {
     },
     'horizontal': {
         'type': 'wing',
-        'planform': 100,  # [ft^2]
+        'planform': 86.5,  # [ft^2]
         'aspect_ratio': 5,  # []
         'sweep_LE': 10,  # [deg]
         'taper': 0.465,  # []
         'station': 85,  # [ft]
         'buttline': 0,  # [ft]
-        'waterline': 0,  # [ft]
+        'waterline': 5,  # [ft]
         'incidence': 0,  # [deg]
         'dihedral': 0,  # [deg]
         'airfoil': '0012',  # [naca airfoils]
@@ -74,13 +74,13 @@ plane = {
     },
     'vertical': {
         'type': 'vertical',
-        'planform': 100,  # [ft^2]
+        'planform': 39.2,  # [ft^2]
         'aspect_ratio': 4,  # []
         'sweep_LE': 20,  # [deg]
         'taper': 0.5,  # []
         'station': 78,  # [ft]
         'buttline': 0,  # [ft]
-        'waterline': 1,  # [ft]
+        'waterline': 5,  # [ft]
         'airfoil': '0012',  # [naca airfoils]
         'n_controls': 1,
         'control_1': {

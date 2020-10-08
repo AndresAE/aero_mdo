@@ -1,7 +1,7 @@
 """Returns force and moment coefficients for fuselages."""
 from numpy import array, ceil, pi
 from scipy.optimize import minimize
-from src.common import unit_conversions
+from src.common import constants
 from src.modeling.aerodynamics import friction_coefficient, pressure_drag
 
 
@@ -13,9 +13,9 @@ class Fuselage:
         """return far 14.25 compliant fuselage cross section parameters."""
         fus = self.plane['fuselage']
         n_aisle = ceil(fus['seats_row'] / 6)
-        w = fus['seats_row'] * unit_conversions.far_25_seat_width() + n_aisle * unit_conversions.far_25_aisle_width()
-        ha = unit_conversions.far_25_aisle_height()
-        hs = unit_conversions.far_25_head_room()
+        w = fus['seats_row'] * constants.far_25_seat_width() + n_aisle * constants.far_25_aisle_width()
+        ha = constants.far_25_aisle_height()
+        hs = constants.far_25_head_room()
 
         def obj(x):
             a_obj = x[0]
@@ -53,17 +53,17 @@ class Fuselage:
         """return far 14.25 compliant fuselage length."""
         fus = self.plane['fuselage']
         n_row = ceil(fus['pax'] / fus['seats_row'])
-        l_row = n_row * unit_conversions.far_25_seat_pitch()
+        l_row = n_row * constants.far_25_seat_pitch()
         n_exit_l = ceil(n_row / 60)
         if fus['pax'] < 20:
             n_exits = max([1, n_exit_l])
-            l_exits = n_exits * unit_conversions.type_3_exit_width()
+            l_exits = n_exits * constants.type_3_exit_width()
         elif fus['pax'] < 40:
             n_exits = max([2, n_exit_l])
-            l_exits = n_exits * unit_conversions.type_2_exit_width()
+            l_exits = n_exits * constants.type_2_exit_width()
         else:
             n_exits = max([2, n_exit_l])
-            l_exits = n_exits * unit_conversions.type_1_exit_width()
+            l_exits = n_exits * constants.type_1_exit_width()
         l_fus = l_exits + l_row
         return l_fus
 

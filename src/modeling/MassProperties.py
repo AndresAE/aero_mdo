@@ -1,5 +1,5 @@
 from numpy import array, ceil, cos, deg2rad, pi
-from src.common import Atmosphere, Earth, unit_conversions
+from src.common import Atmosphere, Earth, constants
 from src.modeling import LiftingSurface
 from src.modeling.Propulsion import propeller
 from src.modeling.trapezoidal_wing import span, sweep_x
@@ -119,7 +119,7 @@ def cargo_weight(aircraft):
     """return cargo/luggage weight."""
     n_pax = aircraft['fuselage']['pax']
     n_fa = n_crew(aircraft)
-    w_cargo = unit_conversions.far_25_cargo_weight() * (n_pax + n_fa)
+    w_cargo = constants.far_25_cargo_weight() * (n_pax + n_fa)
     return w_cargo
 
 
@@ -187,7 +187,7 @@ def nose_gear_weight(aircraft, mtow):
 def paint(aircraft):
     """return paint weight."""
     s_wet = 4 * aircraft['wing']['planform']
-    w_p = unit_conversions.paint_density() * s_wet
+    w_p = constants.paint_density() * s_wet
     return w_p
 
 
@@ -195,7 +195,7 @@ def passenger_weight(aircraft):
     """return passenger weight, includes furnishings."""
     n_fc = n_crew(aircraft)
     n_pax = aircraft['fuselage']['pax']
-    w_pax = (unit_conversions.far_25_passenger_weight() + unit_conversions.far_25_furnishing_weight()) * (n_pax + n_fc)
+    w_pax = (constants.far_25_passenger_weight() + constants.far_25_furnishing_weight()) * (n_pax + n_fc)
     return w_pax
 
 
@@ -216,9 +216,9 @@ def propulsion_weight(aircraft):
         w = aircraft['wing']
         b = span(w['aspect_ratio'], w['planform'])
         w_controls = 60.27 * ((fus['length'] + b) * 10 ** -2) ** 0.724
-        w_prop = 32 * (4 ** 0.391) * (d * p * unit_conversions.lbft_s2hp() * 10 ** -3) ** 0.782
-        w_prop_control = 4.5 * (4 ** 0.379) * (d * p * unit_conversions.lbft_s2hp() * 10 ** -3) ** 0.759
-        w_engine = p * unit_conversions.lbft_s2hp() / unit_conversions.electric_hp_lb()
+        w_prop = 32 * (4 ** 0.391) * (d * p * constants.lbft_s2hp() * 10 ** -3) ** 0.782
+        w_prop_control = 4.5 * (4 ** 0.379) * (d * p * constants.lbft_s2hp() * 10 ** -3) ** 0.759
+        w_engine = p * constants.lbft_s2hp() / constants.electric_hp_lb()
         w_p.append(w_engine + w_prop + w_prop_control + w_controls)
     w_total = sum(w_p)
     return w_total

@@ -14,6 +14,30 @@ def energy_density_jet_a():
     return 11.94  # [kW.hr/kg]
 
 
+def energy_density_li_ion():
+    return 0.22  # [kW.hr/kg]
+
+
+def eta_electric():
+    return 0.7  # []
+
+
+def eta_gas():
+    return 0.335  # []
+
+
+def eta_turbofan():
+    return 0.4  # []
+
+
+def eta_turbojet():
+    return 0.2  # []
+
+
+def eta_turboprop():
+    return 0.4  # []
+
+
 def far_25_aisle_height():
     return 80 / 12  # [ft]
 
