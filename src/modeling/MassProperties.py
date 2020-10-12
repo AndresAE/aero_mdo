@@ -44,7 +44,9 @@ class MassProperties:
 
     def i_xz_simple(self):
         """return empirical aircraft xz axis inertia estimate."""
-        i_xz = 0 * self.aircraft['weight']['weight']
+        w = self.aircraft['weight']['weight']
+        b = span(self.aircraft['wing']['aspect_ratio'], self.aircraft['wing']['planform'])
+        i_xz = ((w / g) * (0.3 * b / 2) ** 2) / 3
         return i_xz
 
     def weight_buildup(self, requirements, tol=10e-2):

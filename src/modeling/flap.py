@@ -4,7 +4,7 @@ from src.modeling.trapezoidal_wing import mac, root_chord, span, y_chord, y_mac
 
 
 def c_f_delta_flap(wing, control, mach):
-    """return flap force coefficient derivatives."""
+    """return flap force coefficient derivatives, empirical method."""
     s = wing['planform']
     w = LiftingSurface(wing)
     c_l_a = w.c_l_alpha_wing(mach)
@@ -14,7 +14,7 @@ def c_f_delta_flap(wing, control, mach):
 
 
 def c_f_m_flap(wing, control, mach, cg):
-    """return flap force and moment coefficient derivatives."""
+    """return flap force and moment coefficient derivatives, empirical method."""
     y_scalar = control['b_2'] / abs(control['b_2'])
     s = wing['planform']
     b = span(wing['aspect_ratio'], s)

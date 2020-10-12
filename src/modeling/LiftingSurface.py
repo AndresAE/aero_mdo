@@ -9,7 +9,7 @@ class LiftingSurface:
         self.wing = wing
 
     def c_l_alpha_wing(self, mach):
-        """return lifting surface lift curve slope."""
+        """return lifting surface lift curve slope, empirical method."""
         c_l_alpha = 2 * pi * 0.9
         ar = self.wing['aspect_ratio']  # []
         sweep_le = self.wing['sweep_LE']  # [deg]
@@ -18,7 +18,7 @@ class LiftingSurface:
         return c_l_alpha_3d
 
     def d_epsilon_d_alpha(self, ht, mach):
-        """return downwash gradient wrt angle of attack."""
+        """return downwash gradient wrt angle of attack, empirical method."""
         ar = self.wing['aspect_ratio']  # []
         taper = self.wing['taper']  # []
         root_chord_wing = root_chord(ar, self.wing['planform'], taper)  # [ft]
@@ -37,7 +37,7 @@ class LiftingSurface:
         return de_da
 
     def aerodynamic_center(self, c=0.25):
-        """return lifting surface aerodynamic center."""
+        """return lifting surface aerodynamic center, empirical method."""
         c_bar = mac(self.wing['aspect_ratio'], self.wing['planform'], self.wing['taper'])  # [ft]
         y = y_mac(self.wing['aspect_ratio'], self.wing['planform'], self.wing['taper'])  # [ft]
         x = x_mac(y, self.wing['sweep_LE'])  # [ft]
@@ -45,7 +45,7 @@ class LiftingSurface:
         return x_ac
 
     def parasite_drag(self, mach, altitude):
-        """return parasitic drag coefficient of the lifting surface."""
+        """return parasitic drag coefficient of the lifting surface, empirical method."""
         t_c = self.wing['airfoil']
         t_c = int(t_c[-2:]) / 100
         s_wet_s = (2 + 2 * (t_c / self.wing['aspect_ratio']) +
@@ -57,7 +57,7 @@ class LiftingSurface:
         return c_d_0
 
     def d_sigma_d_beta_ht(self, ht, fuselage):
-        """return sidewash gradient wrt sideslip."""
+        """return sidewash gradient wrt sideslip, empirical method."""
         wing = self.wing
         ar = wing['aspect_ratio']
         s_w = wing['planform']
@@ -69,7 +69,7 @@ class LiftingSurface:
         return eta_ds_db
 
     def d_sigma_d_beta_vt(self, vt, fuselage):
-        """return sidewash gradient wrt sideslip."""
+        """return sidewash gradient wrt sideslip, empirical method."""
         wing = self.wing
         ar = wing['aspect_ratio']
         s_w = wing['planform']
