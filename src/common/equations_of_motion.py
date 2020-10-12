@@ -45,7 +45,8 @@ def nonlinear_eom(x, m, j, c):
 
 
 def nonlinear_eom_to_ss(aircraft, x_ss, u_ss, x_0, u_0, m, j, dx=0.1, du=0.1):
-    """aircraft system linearization routine"""
+    """aircraft system linearization routine."""
+    """return jacobians a, b wrt to x_ss and output matrices c, and d wrt u_ss."""
     x = x_0
     u = u_0
     a = zeros((len(x_0), len(x_0)))

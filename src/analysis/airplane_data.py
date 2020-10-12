@@ -1,6 +1,7 @@
+"""return plotted airliner data from data>airliner_data.csv."""
 import csv
 from matplotlib import pyplot as plt
-from numpy import array, linspace, polyfit, polyval
+from numpy import array, linspace
 import os
 
 cur_path = os.path.dirname(__file__)

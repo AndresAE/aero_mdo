@@ -1,3 +1,4 @@
+"""1976 standard atmosphere model."""
 from numpy import exp, sqrt
 gas_constant = 1716.5  # ft*lb/(slug*R)
 gamma = 1.4  # []

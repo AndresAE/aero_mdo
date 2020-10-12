@@ -27,6 +27,7 @@ def aircraft_range(aircraft, mach, altitude):
 
 def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
     """return balanced field length."""
+    """return v_1, v_r, v_2, v_lof."""
     alt_f = x_0[-1] + h_f
     u_0[1] = aircraft['horizontal']['control_1']['limits'][0] * pi / 180
     v_unstick = trim_vr(aircraft, x_0[-1], u_0)

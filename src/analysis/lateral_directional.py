@@ -12,6 +12,7 @@ g = Earth(0).gravity()  # f/s2
 
 
 def directional_stability(plane, mach, alpha):
+    """return airplane static directional stability."""
     c_n_b = Aircraft(plane, mach).c_n_beta(alpha)
     return c_n_b
 
@@ -23,6 +24,7 @@ def dutch_roll_mode(aircraft, x_0, u_0):
 
 
 def lateral_stability(plane, mach, alpha):
+    """return airplane static lateral stability."""
     c_r_b = Aircraft(plane, mach).c_r_beta(alpha)
     return c_r_b
 

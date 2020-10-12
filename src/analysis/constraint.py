@@ -6,6 +6,7 @@ from src.modeling.Aircraft import Aircraft
 
 def master_constraint(aircraft, wing_loading, mach, altitude, n, gamma, a_x):
     """master constraint equation for flight."""
+    "return sea level static thrust to weight ratio"
     g = Earth(0).gravity()
     rho = Atmosphere(altitude).air_density()
     rho_sl = Atmosphere(0).air_density()
@@ -34,6 +35,7 @@ def stall_speed(mach, altitude, c_l_max, n, gamma):
 
 def takeoff(aircraft, wing_loading, s_to, altitude, mu):
     """takeoff constraint equation."""
+    "return sea level static thrust to weight ratio"
     g = Earth(0).gravity()
     rho = Atmosphere(altitude).air_density()
     rho_sl = Atmosphere(0).air_density()
