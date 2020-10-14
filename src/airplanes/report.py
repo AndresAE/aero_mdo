@@ -1,9 +1,9 @@
 from matplotlib import pyplot as plt
 from numpy import arctan, array, cos, deg2rad, linspace, sin, zeros
 from src.common import Atmosphere, Earth
-from src.common.report_tools import create_output_dir, plot_or_save
-from src.analysis.lateral_directional import dutch_roll_mode, latdir_stability_nonlinear, minimum_control_speed_air, \
-    plot_dr, roll_mode, spiral_mode
+from src.common.report_tools import create_output_dir, load_aero_model, model_exists, plot_or_save
+from src.analysis.lateral_directional import dutch_roll_mode, latdir_stability_nonlinear, plot_dr, roll_mode, \
+    spiral_mode
 from src.analysis.longitudinal import aircraft_range, balanced_field_length, maneuvering, maneuvering_envelope, \
     plot_sp, short_period_mode, specific_excess_power, static_margin_nonlinear
 from src.analysis.trim import trim_aileron_nonlinear, trim_aileron_rudder_nonlinear, trim_alpha_de_nonlinear, trim_vx, \
@@ -15,6 +15,8 @@ save_plot = 1
 
 # Sweep
 def report_sweep(plane, requirements):
+    if model_exists(plane['name']):
+        plane['aero_model'] = load_aero_model(plane['name'])
     name = plane['name']
     create_output_dir(name)
     machs = linspace(requirements['flight_envelope']['mach'][0],
@@ -53,7 +55,8 @@ def report_sweep(plane, requirements):
         i_mach = 0
         # altitude iterative
         # stability and control
-        vmc[i_alt] = minimum_control_speed_air(plane, alt_i)
+        trim_vx(plane, alt_i)
+        trim_vy(plane, alt_i)
 
         for mach_i in machs:
             a = Atmosphere(alt_i).speed_of_sound()
@@ -83,11 +86,9 @@ def report_sweep(plane, requirements):
             da_roll[i_alt, i_mach] = out_p
 
             # performance
-            trim_vx(plane, alt_i)
-            trim_vy(plane, alt_i)
             p_s[i_alt, i_mach] = specific_excess_power(plane, x_0, u_0)
             alpha_nz[i_alt, i_mach, :], de_nz[i_alt, i_mach, :] = maneuvering(plane, mach_i, alt_i, n_z)
-            r[i_alt, i_mach] = aircraft_range(plane, mach_i, alt_i)
+            r[i_alt, i_mach] = aircraft_range(plane, x_0, u_0)
             i_mach = i_mach + 1
         i_alt = i_alt + 1
 
@@ -225,7 +226,7 @@ def report_sweep(plane, requirements):
     plot_or_save(plt, show_plot, save_plot, name, 'specific_excess_power')
 
     plt.figure()
-    levels = linspace(0, 5000, 51)
+    levels = linspace(0, 50000, 501)
     cs = plt.contour(machs, altitudes, r, levels)
     plt.clabel(cs, levels, fmt='%1.0f')
     plt.title('range [nm]')

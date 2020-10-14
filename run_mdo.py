@@ -19,14 +19,14 @@ def main():
 
 def aero_report(plane_name):
     plane = __import__('src.airplanes.%s.plane' % plane_name, fromlist=['plane'])
-    report = __import__('src.airplanes.%s.report' % plane_name, fromlist=['report'])
+    report = __import__('src.airplanes.report' % plane_name, fromlist=['report'])
     report.report_sweep(plane.plane, plane.requirements)
     return
 
 
 def aero_design(plane_name):
     plane = __import__('src.airplanes.%s.plane' % plane_name, fromlist=['plane'])
-    design = __import__('src.airplanes.%s.design' % plane_name, fromlist=['design'])
+    design = __import__('src.airplanes.design' % plane_name, fromlist=['design'])
     design.report_sweep(plane.plane, plane.requirements, name=plane_name)
     return
 

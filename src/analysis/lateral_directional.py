@@ -4,7 +4,6 @@ from numpy import array, gradient, linalg, log, max, mean, min, unique, real
 from src.analysis.trim import trim_aileron_rudder_speed_nonlinear
 from src.common import Earth, Atmosphere
 from src.common.equations_of_motion import nonlinear_eom_to_ss
-from src.common.report_tools import model_exists
 from src.common.rotations import body_to_wind
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import linear_aero, nonlinear_aero
@@ -41,7 +40,7 @@ def latdir_stability_nonlinear(plane, mach, altitude, alpha, de, delta=0.01):
         b2w = body_to_wind(alpha, bi)
         uvw = linalg.inv(b2w) @ array([v, 0, 0])
         x = [uvw[0], uvw[1], uvw[2], 0, alpha, 0, 0, 0, 0, 0, 0, altitude]
-        if model_exists(plane['name']):
+        if 'aero_model' in plane.keys():
             cfm = nonlinear_aero(plane, x, u)
         else:
             cfm = linear_aero(plane, x, u)
@@ -77,12 +76,19 @@ def latdir_modes(aircraft, x_0, u_0):
 def minimum_control_speed_air(plane, altitude):
     """return minimum control speed in air for given altitude."""
     prop = plane['propulsion']
+    c = []
     if prop['n_engines'] > 1:
-        pitch = prop['engine_1']['pitch']
-        plane['propulsion']['engine_1']['pitch'] = 0
-        c = trim_aileron_rudder_speed_nonlinear(plane, altitude, 0, 0, 0)
+        if prop['engine_1']['type'] == 'prop':
+            pitch = prop['engine_1']['pitch']
+            plane['propulsion']['engine_1']['pitch'] = 0
+            c = trim_aileron_rudder_speed_nonlinear(plane, altitude, 0, 0, 0)
+            plane['propulsion']['engine_1']['pitch'] = pitch
+        elif prop['engine_1']['type'] == 'jet':
+            thrust = prop['engine_1']['thrust']
+            plane['propulsion']['engine_1']['thrust'] = 0
+            c = trim_aileron_rudder_speed_nonlinear(plane, altitude, 0, 0, 0)
+            plane['propulsion']['engine_1']['thrust'] = thrust
         vmca = c[4]
-        plane['propulsion']['engine_1']['pitch'] = pitch
     else:
         vmca = 0
     return vmca

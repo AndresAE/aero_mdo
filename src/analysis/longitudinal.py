@@ -1,21 +1,26 @@
 from control import damp, StateSpace
 from matplotlib import pyplot as plt
-from numpy import append, array, cos, gradient, linspace, log, max, mean, min, unique, pi, sin, sort, sqrt, sum, zeros
+from numpy import append, array, cos, flip, floor, gradient, linspace, log, max, mean, min, unique, pi, sin, sort, \
+    sqrt, sum, zeros
+from scipy.interpolate import InterpolatedUnivariateSpline
 from src.analysis.trim import trim_alpha_de_throttle, trim_vr, trim_vs, trim_vs_nonlinear
 from src.common import Atmosphere, Earth
 from src.common.equations_of_motion import nonlinear_eom, nonlinear_eom_to_ss
-from src.common.report_tools import model_exists
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import c_f_m, landing_gear_loads, linear_aero, nonlinear_aero
 g = Earth(0).gravity()  # f/s2
 
 
-def aircraft_range(aircraft, mach, altitude):
+def aircraft_range(aircraft, x, u):
     """return aircraft range in nautical miles."""
     sigma = aircraft['propulsion']['energy_density']
     eta = aircraft['propulsion']['total_efficiency']
     m_fuel = aircraft['propulsion']['fuel_mass']
-    l_d = l_over_d(aircraft, mach, altitude)
+    if 'aero_model' in aircraft.keys():
+        c_aero = nonlinear_aero(aircraft, x, u)
+    else:
+        c_aero = linear_aero(aircraft, x, u)
+    l_d = c_aero[2] / c_aero[0]
     w_i = aircraft['weight']['weight']
     if aircraft['propulsion']['const_mass']:
         r = (sigma * eta * m_fuel) / (w_i / l_d) / 6076
@@ -31,8 +36,8 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
     alt_f = x_0[-1] + h_f
     u_0[1] = aircraft['horizontal']['control_1']['limits'][0] * pi / 180
     v_unstick = trim_vr(aircraft, x_0[-1], u_0)
-    v_s = trim_vs(aircraft, x_0[-1], 0)
-    v_rotate = 1.2 * max([v_s, v_unstick])
+    v_lof = trim_vs(aircraft, x_0[-1], 0)
+    v_rotate = 1.2 * max([v_lof, v_unstick])
     u_0[1] = 0.0
     dt = 0.01
     v = []
@@ -70,6 +75,7 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
         t_out.append(t)
 
     out = trim_alpha_de_throttle(aircraft, v[-1], h[-1], 5)
+    v_2 = v[-1]
     u_0[1] = out[1] * pi / 180
     u_0[3] = out[2]
     while h[-1] < alt_f:
@@ -86,6 +92,11 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
     u_rto = u_0
     u_rto[-1] = 0.001
     v_rto, s_rto = rejected_takeoff(aircraft, s[-1], x_rto, u_rto)
+    f_rto_i = InterpolatedUnivariateSpline(s_rto[0:int(floor(len(s) * 0.7))],
+                                           v_rto[0:int(floor(len(s) * 0.7))])
+    v_rto_i = f_rto_i(array(s[0:int(floor(len(s) * 0.7))]))
+    f_1 = InterpolatedUnivariateSpline(v[0:int(floor(len(s) * 0.7))] - v_rto_i, v[0:int(floor(len(s) * 0.7))])
+    v_1 = f_1(0)
 
     plt.figure(figsize=(10, 8))
     plt.subplot(3, 1, 1)
@@ -102,12 +113,13 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
     plt.grid(True)
     plt.subplot(3, 1, 3)
     plt.plot(s, pitch, label='pitch')
-    plt.plot(s, de, label='Elevator')
+    plt.plot(s, de, label='elevator')
     plt.legend()
     plt.ylabel('angles [deg]')
     plt.xlabel('distance [ft]')
     plt.xlim((0, s[-1] + 10))
     plt.grid(True)
+    return v_rotate, v_1, v_2, v_lof
 
 
 def long_modes(aircraft, x_0, u_0):
@@ -219,9 +231,9 @@ def plot_sp():
     plt.yscale("log")
 
 
-def rejected_takeoff(aircraft, s_f, x_0, u_0):
+def rejected_takeoff(aircraft, s_f, x_0, u_0, v_max=400):
     """return derivatives for aircraft on ground."""
-    v = [5 * x for x in range(1, 100)]
+    v = linspace(5, v_max, 100)
     m = aircraft['weight']['weight']/g
     j = aircraft['weight']['inertia']
     x = []
@@ -231,6 +243,8 @@ def rejected_takeoff(aircraft, s_f, x_0, u_0):
         c_t, c_g, normal_loads = landing_gear_loads(aircraft, x_0, c, True, brake=1)
         dxdt = nonlinear_eom(x_0, m, j, c_t)
         x.append(s_f + (vi ** 2) / (2 * dxdt[0]))
+    v = flip(v)
+    x = flip(x)
     return v, x
 
 
@@ -269,7 +283,7 @@ def static_margin_nonlinear(plane, mach, altitude, alpha, de, delta=0.01):
     cm = []
     for ai in alphas:
         x = [v * cos(ai), 0, v * sin(ai), 0, ai, 0, 0, 0, 0, 0, 0, altitude]
-        if model_exists(plane['name']):
+        if 'aero_model' in plane.keys():
             cfm = nonlinear_aero(plane, x, u)
         else:
             cfm = linear_aero(plane, x, u)

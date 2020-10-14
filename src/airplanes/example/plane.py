@@ -102,9 +102,9 @@ plane = {
         'seats_row': 2,
     },
     'weight': {
-        'weight': 30000,  # [lb]
+        'weight': 24000,  # [lb]
         'inertia': [[141933, 0, 30000], [0, 221088, 0], [30000, 0, 318803]],  # [slug*ft^2]
-        'cg': [43, 0, 5]  # [ft]
+        'cg': [40, 0, 5]  # [ft]
     },
     'propulsion': {
         'n_engines': 6,

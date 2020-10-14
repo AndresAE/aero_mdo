@@ -127,7 +127,7 @@ def trim_aileron_nonlinear(aircraft, speed, altitude, roll_rate, tol=1e-1):
         dxdt = c_f_m(aircraft, x, u)
         return sqrt(sum(dxdt ** 2)) / 1000
 
-    lim_ail = aircraft['wing']['control_4']['limits']
+    lim_ail = aircraft['wing']['control_1']['limits']
     lim = Bounds(deg2rad(lim_ail[0]), deg2rad(lim_ail[1]))
     x0 = array([0.0])
     u_out = minimize(obj, x0, bounds=lim, tol=tol,
@@ -151,7 +151,7 @@ def trim_aileron_rudder_nonlinear(aircraft, speed, altitude, alpha, beta, roll_r
         dxdt = c_f_m(aircraft, x, u)
         return sqrt(sum(dxdt ** 2)) / 1000
 
-    lim_ail = aircraft['wing']['control_4']['limits']
+    lim_ail = aircraft['wing']['control_1']['limits']
     lim_rud = aircraft['vertical']['control_1']['limits']
     lim = ([deg2rad(lim_ail[0]), deg2rad(lim_ail[1])], [deg2rad(lim_rud[0]), deg2rad(lim_rud[1])])
     x0 = array([0.0, 0.0])
@@ -177,9 +177,9 @@ def trim_aileron_rudder_speed_nonlinear(aircraft, altitude, beta, roll_rate, yaw
         cfm = c_f_m(aircraft, x, u)
         return cfm[1] + cfm[2] + cfm[3] + cfm[4] + cfm[5]
 
-    lim_ail = aircraft['wing']['control_4']['limits']
+    lim_ail = aircraft['wing']['control_1']['limits']
     lim_rud = aircraft['vertical']['control_1']['limits']
-    lim_ele = aircraft['horizontal']['control_2']['limits']
+    lim_ele = aircraft['horizontal']['control_1']['limits']
     lim = ([deg2rad(lim_ail[0]), deg2rad(lim_ail[1])], [deg2rad(lim_rud[0]), deg2rad(lim_rud[1])],
            [-5/57.3, aircraft['wing']['alpha_stall']/57.3], [deg2rad(lim_ele[0]), deg2rad(lim_ele[1])], [10, 500])
     x0 = array([0.0, 0.0, 0.0, 0.0, 500])
@@ -287,10 +287,10 @@ def trim_vx(aircraft, altitude, tol=1e-1):
 
     lim_ele = aircraft['horizontal']['control_2']['limits']
     lim = ([-5/57.3, aircraft['wing']['alpha_stall']/57.3], [deg2rad(lim_ele[0]), deg2rad(lim_ele[1])], [0.1, 1000])
-    x0 = array([0.01, -0.01, 20])
+    x0 = array([0.01, -0.01, 100])
     u_out = minimize(obj, x0, bounds=lim, tol=tol,
                      constraints=({'type': 'eq', 'fun': alpha_stab}),
-                     options=({'maxiter': 200}))
+                     options=({'maxiter': 500}))
     c = u_out['x']
     c[0:2] = rad2deg(c[0:2])
     return c

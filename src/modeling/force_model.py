@@ -32,7 +32,7 @@ def c_f_m(aircraft, x, u):
     q_bar = dynamic_pressure(mach, altitude)  # [psf]
     s = aircraft['wing']['planform']  # [ft2]
 
-    if model_exists(aircraft['name']):
+    if 'aero_model' in aircraft.keys():
         c_aero = nonlinear_aero(aircraft, x, u)
     else:
         c_aero = linear_aero(aircraft, x, u)
@@ -148,7 +148,7 @@ def nonlinear_aero(aircraft, x, u):
     mach = v / a  # []
     alpha = rad2deg(arctan(x[2] / x[0]))
     beta = rad2deg(arctan(x[1] / x[0]))
-    model = load_aero_model(aircraft['name'])
+    model = aircraft['aero_model']
     s = aircraft['wing']['planform']  # [ft2]
     cbar = mac(aircraft['wing']['aspect_ratio'], s, aircraft['wing']['taper'])  # [ft]
     b = span(aircraft['wing']['aspect_ratio'], s)  # [ft]

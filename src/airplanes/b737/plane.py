@@ -1,6 +1,6 @@
 """airplane geometry file."""
 plane = {
-    'name': 'example',
+    'name': 'b737',
     'wing': {
         'type': 'wing',
         'planform': 980,  # [ft^2]
@@ -19,7 +19,7 @@ plane = {
             'name': 'aileron_l',
             'limits': [-30, 30],  # [deg]
             'cf_c': 0.4,
-            'b_1': -94,
+            'b_1': -0.94,
             'b_2': -0.75,
         },
         'control_2': {
@@ -45,14 +45,14 @@ plane = {
         'n_controls': 2,
         'control_1': {
             'name': 'elevator_l',
-            'limits': [-25, 15],  # [deg]
+            'limits': [-30, 30],  # [deg]
             'cf_c': 0.25,
             'b_1': -1,
             'b_2': 0.1,
         },
         'control_2': {
             'name': 'elevator_r',
-            'limits': [-25, 15],  # [deg]
+            'limits': [-30, 30],  # [deg]
             'cf_c': 0.25,
             'b_1': 0.1,
             'b_2': 1,
@@ -83,49 +83,45 @@ plane = {
         'height': 13.1,  # [ft]
         'l_cabin': 60,  # [ft]
         'l_cockpit': 13,  # [ft]
-        'pax': 30,
-        'lavatories': 0,
+        'pax': 123,
+        'lavatories': 2,
         'seats_row': 6,
     },
     'weight': {
-        'weight': 30000,  # [lb]
-        'inertia': [[141933, 0, 30000], [0, 221088, 0], [30000, 0, 318803]],  # [slug*ft^2]
-        'cg': [49.1, 0, 4]  # [ft]
+        'weight': 144500,  # [lb]
+        'inertia': [[441933, 0, 120000], [0, 821088, 0], [120000, 0, 1218803]],  # [slug*ft^2]
+        'cg': [60, 0, 4]  # [ft]
     },
     'propulsion': {
         'n_engines': 2,
-        'const_mass': 1,
-        'fuel_mass': 6000 / 32.2,  # [slug]
+        'const_mass': 0,
+        'fuel_mass': 46750 / 32.2,  # [slug]
         'energy_density': 11.8 * 2655224 / 0.0685218,  # [ft^2 / s^2]
         'total_efficiency': 0.4,
         'engine_1': {
-            'type': 'prop',
+            'type': 'jet',
             'station': 36,  # [ft]
-            'waterline': 1,  # [ft]
-            'buttline': -40,  # [ft]
+            'waterline': 4,  # [ft]
+            'buttline': -15,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
-            'diameter': 4,  # [ft]
-            'rpm_max': 11000,  # [rpm]
-            'pitch': 20  # [deg]
+            'thrust': 20000,  # [lb]
         },
         'engine_2': {
-            'type': 'prop',
+            'type': 'jet',
             'station': 36,  # [ft]
-            'waterline': 1,  # [ft]
-            'buttline': -30,  # [ft]
+            'waterline': 4,  # [ft]
+            'buttline': 15,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
-            'diameter': 4,  # [ft]
-            'rpm_max': 11000,  # [rpm]
-            'pitch': 20  # [deg]
+            'thrust': 20000,  # [lb]
         },
     },
     'landing_gear': {
         'nose': [15, 0, -4],  # [ft]
         'nose_diameter': 1,  # [ft]
         'nose_width': 0.5,  # [ft]
-        'main': [46, 12, -4],  # [ft], left (mirrored on the right)
+        'main': [65, 8, -8],  # [ft], left (mirrored on the right)
         'main_diameter': 1.5,  # [ft]
         'main_width': 1.5,  # [ft]
         'mu_roll': 0.02,
@@ -155,12 +151,12 @@ requirements = {
         'crosswind': 15,  # [ft/s]
     },
     'flight_envelope': {
-        'mach': [0.2, 0.6],
+        'mach': [0.2, 0.9],
         'alpha': [-5, 15],  # [deg]
         'beta': [-10, 10],  # [deg]
         'p': [-20, 20],  # [deg/s]
         'q': [-20, 20],  # [deg/s]
         'r': [-20, 20],  # [deg/s]
-        'altitude': [0, 30000]  # [ft]
+        'altitude': [0, 45000]  # [ft]
     }
 }

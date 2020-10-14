@@ -43,7 +43,7 @@ class Aircraft:
 
         # ailerons
         cfm_l = c_f_m_flap(wing, wing['control_1'], mach, cg)
-        cfm_r = c_f_m_flap(wing, wing['control_4'], mach, cg)
+        cfm_r = c_f_m_flap(wing, wing['control_%d' % wing['n_controls']], mach, cg)
         self.cfm_da = (cfm_l + cfm_r * -1)
         self.cfm_da[3:6] = self.cfm_da[3:6] / array([self.b, self.c_bar, self.b])
 

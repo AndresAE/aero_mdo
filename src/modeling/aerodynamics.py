@@ -16,7 +16,7 @@ def create_aero_model_avl(aircraft, requirements):
     p = linspace(requirements['flight_envelope']['p'][0], requirements['flight_envelope']['p'][1], num=5)
     q = linspace(requirements['flight_envelope']['q'][0], requirements['flight_envelope']['q'][1], num=5)
     r = linspace(requirements['flight_envelope']['r'][0], requirements['flight_envelope']['r'][1], num=5)
-    d_a = linspace(aircraft['wing']['control_4']['limits'][0], aircraft['wing']['control_4']['limits'][1], num=5)
+    d_a = linspace(aircraft['wing']['control_1']['limits'][0], aircraft['wing']['control_1']['limits'][1], num=5)
     d_e = linspace(aircraft['horizontal']['control_2']['limits'][0],
                    aircraft['horizontal']['control_2']['limits'][1], num=4)
     d_e = sort(unique(concatenate((d_e, array([0])))))
@@ -133,13 +133,13 @@ def run_avl(aircraft, mach, alpha, beta, p, q, r, u, iplot=0):
     wing_span = span(wing_aspect_ratio, wing_area)
     wing_mac = mac(wing_aspect_ratio, wing_area, wing_taper)
     sections = list()
-    if not wing['control_4']['b_1'] == 0:
+    if not wing['control_1']['b_2'] == 0:
         sections.append(avl_section(wing_root_le_pnt[1], 0, wing, 1, []))
-    sections.append(avl_section(wing_root_le_pnt[1] + wing_span * 0.5 * wing['control_4']['b_1'],
-                    wing['control_4'], wing, 1, 'aileron', duplicate_sign=-1))
-    sections.append(avl_section(wing_root_le_pnt[1] + wing_span * 0.5 * wing['control_4']['b_2'],
-                    wing['control_4'], wing, 1, 'aileron', duplicate_sign=-1))
-    if not wing['control_4']['b_2'] == 1:
+    sections.append(avl_section(wing_root_le_pnt[1] + wing_span * 0.5 * - wing['control_1']['b_2'],
+                    wing['control_1'], wing, 1, 'aileron', duplicate_sign=-1))
+    sections.append(avl_section(wing_root_le_pnt[1] + wing_span * 0.5 * - wing['control_1']['b_1'],
+                    wing['control_1'], wing, 1, 'aileron', duplicate_sign=-1))
+    if not wing['control_1']['b_1'] == - 1:
         sections.append(avl_section(wing_root_le_pnt[1] + wing_span * 0.5, 0, wing, 1, []))
 
     # y_duplicate=0.0 duplicates the wing over a XZ-plane at Y=0.0
