@@ -58,6 +58,7 @@ class MassProperties:
         n = max(abs(array(requirements['loads']['n_z'])))
 
         res = 10
+        w_ai = anti_icing_weight(aircraft)
         w_avi = avionics_weight(aircraft, r)
         w_car = cargo_weight(aircraft)
         w_ele = electrical_weight(aircraft)
@@ -66,7 +67,7 @@ class MassProperties:
         w_pax = passenger_weight(aircraft)
         w_prp = propulsion_weight(aircraft)
         w_ful = aircraft['propulsion']['fuel_mass'] * g
-        w_fixed = w_avi + w_car + w_ele + w_fus + w_pnt + w_pax + w_prp + w_ful
+        w_fixed = w_avi + w_car + w_ele + w_fus + w_pnt + w_pax + w_prp + w_ful + w_ai
         w_fcs = 0
         w_ht = 0
         w_mg = 0
@@ -103,6 +104,15 @@ class MassProperties:
         # j = inertia tensor
         # cg = [x, y, z]
         return mtow, cg
+
+
+def anti_icing_weight(aircraft):
+    """return cargo/luggage weight."""
+    w = aircraft['wing']
+    b = span(w['aspect_ratio'], w['planform'])
+    sweep = w['sweep_LE']
+    w_ai = b / cos(deg2rad(sweep)) + 3.8 * aircraft['propulsion']['n_engines'] + 1.5 * aircraft['fuselage']['width']
+    return w_ai
 
 
 def avionics_weight(aircraft, r):
@@ -142,11 +152,13 @@ def fcs_weight(aircraft, mtow, mach):
     s_w = w['planform']
     s_ht = ht['planform']
     s_vt = vt['planform']
-    s_f = (w['control_3']['b_2'] - w['control_3']['b_1']) * w['control_3']['cf_c'] * s_w
-    s_a = (w['control_4']['b_2'] - w['control_4']['b_1']) * w['control_4']['cf_c'] * s_w
+    s_a = (w['control_1']['b_2'] - w['control_1']['b_1']) * w['control_1']['cf_c'] * s_w
     s_e = (ht['control_2']['b_2'] - ht['control_2']['b_1']) * ht['control_2']['cf_c'] * s_ht
     s_r = (vt['control_1']['b_2'] - vt['control_1']['b_1']) * vt['control_1']['cf_c'] * s_vt
-    s_flap = s_f + s_a + s_e + s_r
+    s_flap = s_a + s_e + s_r
+    if 'control_3' in w:
+        s_f = (w['control_3']['b_2'] - w['control_3']['b_1']) * w['control_3']['cf_c'] * s_w
+        s_flap = s_flap + s_f
     w_fcs = 1.1 * (mach ** 0.52) * (s_flap ** 0.6) * mtow ** 0.32
     return w_fcs
 
@@ -154,7 +166,7 @@ def fcs_weight(aircraft, mtow, mach):
 def fuselage_weight(aircraft):
     """return fuselage weight."""
     fus = aircraft['fuselage']
-    w_fus = 1.35 * ((fus['length'] * fus['width']) ** 1.28)
+    w_fus = 1.5 * ((fus['length'] * fus['width']) ** 1.35)
     return w_fus
 
 
@@ -204,25 +216,35 @@ def passenger_weight(aircraft):
 def propulsion_weight(aircraft):
     """return engine weight."""
     w_p = []
+    fus = aircraft['fuselage']
+    w = aircraft['wing']
+    b = span(w['aspect_ratio'], w['planform'])
+    length = fus['length']
     for ii in range(0, aircraft['propulsion']['n_engines']):
         engine = aircraft['propulsion']["engine_%d" % (ii + 1)]
-        t = propeller(engine, [0, 0, 0], 0, 1)
-        t = (sum(t[0:3] ** 2)) ** 0.5
-        rho = Atmosphere(0).air_density()
-        d = engine['diameter']
-        a = pi * (d / 2) ** 2
-        u_e = (2 * t / (rho * a)) ** 0.5
-        u_disk = u_e / 2
-        p = t * u_disk
-        fus = aircraft['fuselage']
-        w = aircraft['wing']
-        b = span(w['aspect_ratio'], w['planform'])
-        w_controls = 60.27 * ((fus['length'] + b) * 10 ** -2) ** 0.724
-        w_prop = 32 * (4 ** 0.391) * (d * p * constants.lbft_s2hp() * 10 ** -3) ** 0.782
-        w_prop_control = 4.5 * (4 ** 0.379) * (d * p * constants.lbft_s2hp() * 10 ** -3) ** 0.759
-        w_engine = p * constants.lbft_s2hp() / constants.electric_hp_lb()
-        w_p.append(w_engine + w_prop + w_prop_control + w_controls)
-    w_total = sum(w_p)
+        if engine['type'] == 'prop':
+            t = propeller(engine, [0, 0, 0], 0, 1)
+            t = (sum(t[0:3] ** 2)) ** 0.5
+            rho = Atmosphere(0).air_density()
+            d = engine['diameter']
+            a = pi * (d / 2) ** 2
+            u_e = (2 * t / (rho * a)) ** 0.5
+            u_disk = u_e / 2
+            p = t * u_disk
+            w_controls = 60.27 * ((length + b) * 10 ** -2) ** 0.724
+            w_prop = 32 * (4 ** 0.391) * (d * p * constants.lbft_s2hp() * 10 ** -3) ** 0.782
+            w_prop_control = 4.5 * (4 ** 0.379) * (d * p * constants.lbft_s2hp() * 10 ** -3) ** 0.759
+            w_engine = p * constants.lbft_s2hp() / constants.electric_hp_lb()
+            w_p.append(w_engine + w_prop + w_prop_control + w_controls)
+        if engine['type'] == 'jet':
+            w_controls = 88.46 * ((length + b) * 10 ** -2) ** 0.294
+            w_engine = engine['thrust'] / constants.jet_lbt_lb()
+            d_nac = 0.04 * engine['thrust'] ** 0.5
+            l_nac = 0.07 * engine['thrust'] ** 0.5
+            w_nac = 0.25 * d_nac * l_nac * engine['thrust'] ** 0.36
+            w_p.append(w_engine + w_controls + w_nac)
+    w_fuel_tank = 1.07 * (aircraft['propulsion']['fuel_mass'] * g) ** 0.58
+    w_total = sum(w_p) + w_fuel_tank
     return w_total
 
 
@@ -239,6 +261,6 @@ def wing_weight(aircraft, mtow, mach, n):
     tc = w['airfoil']
     tc = int(tc[-2:]) / 100
     sweep_2 = sweep_x(w['aspect_ratio'], w['taper'], w['sweep_LE'], 0.5)
-    w_w = 0.00428 * ((w['planform'] ** 0.48) * w['aspect_ratio'] * (mach ** 0.43) * ((mtow * n) ** 0.84) *
+    w_w = 0.006 * ((w['planform'] ** 0.48) * w['aspect_ratio'] * (mach ** 0.43) * ((mtow * n) ** 0.84) *
                      (w['taper'] ** 0.14) / (((100 * tc) ** 0.76) * cos(deg2rad(sweep_2)) ** 1.54))
     return w_w

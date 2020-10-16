@@ -74,6 +74,10 @@ def ft2nm():
     return 6076.12
 
 
+def jet_lbt_lb():
+    return 5
+
+
 def kg2slug():
     return 0.0685218
 

@@ -137,9 +137,9 @@ requirements = {
         'bfl': 5000,  # [ft]
         'stall_speed': 100,  # [ft/s]
         'to_altitude': 5000,  # [ft]
-        'cruise_mach': 0.5,  # [ft/s]
+        'cruise_mach': 0.785,  # [ft/s]
         'cruise_altitude': 25000,  # [ft]
-        'range': 500,  # [nm]
+        'range': 3235,  # [nm]
     },
     'stability_and_control': {
         'c_n_b': 0.05,  # [1/deg]

@@ -92,12 +92,12 @@ plane = {
         },
     },
     'fuselage': {
-        'length': 90,  # [ft]
-        'width': 10,  # [ft]
-        'height': 10,  # [ft]
-        'l_cabin': 60,  # [ft]
-        'l_cockpit': 8,  # [ft]
-        'pax': 30,
+        'length': 50,  # [ft]
+        'width': 7,  # [ft]
+        'height': 7,  # [ft]
+        'l_cabin': 30,  # [ft]
+        'l_cockpit': 5,  # [ft]
+        'pax': 20,
         'lavatories': 0,
         'seats_row': 2,
     },
@@ -110,7 +110,7 @@ plane = {
         'n_engines': 6,
         'const_mass': 1,
         'fuel_mass': 6000 / 32.2,  # [slug]
-        'energy_density': 11.8 * 2655224 / 0.0685218,  # [ft^2 / s^2]
+        'energy_density': 0.22 * 2655224 / 0.0685218,  # [ft^2 / s^2]
         'total_efficiency': 0.4,
         'engine_1': {
             'type': 'prop',
