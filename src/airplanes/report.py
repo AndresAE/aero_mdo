@@ -20,9 +20,9 @@ def report_sweep(plane, requirements):
     name = plane['name']
     create_output_dir(name)
     machs = linspace(requirements['flight_envelope']['mach'][0],
-                     requirements['flight_envelope']['mach'][1], 5)
+                     requirements['flight_envelope']['mach'][1], 10)
     altitudes = linspace(requirements['flight_envelope']['altitude'][0],
-                         requirements['flight_envelope']['altitude'][1], 3)
+                         requirements['flight_envelope']['altitude'][1], 5)
 
     # Requirements
     n_z = [requirements['loads']['n_z'][0], 1, requirements['loads']['n_z'][1]]  # [g]

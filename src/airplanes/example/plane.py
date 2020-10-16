@@ -110,7 +110,7 @@ plane = {
         'n_engines': 6,
         'const_mass': 1,
         'fuel_mass': 6000 / 32.2,  # [slug]
-        'energy_density': 0.22 * 2655224 / 0.0685218,  # [ft^2 / s^2]
+        'energy_density': 12.2 * 2655224 / 0.0685218,  # [ft^2 / s^2]
         'total_efficiency': 0.4,
         'engine_1': {
             'type': 'prop',

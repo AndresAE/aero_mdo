@@ -8,7 +8,7 @@ cur_path = os.path.dirname(__file__)
 os.chdir("..")
 os.chdir("..")
 
-filename = 'data\\airliner_data.csv'
+filename = 'data\\misc_data\\airliner_data.csv'
 # read airliner data csv
 results = []
 with open(filename) as csv_file:
