@@ -86,6 +86,10 @@ def lbft_s2hp():
     return 1 / 550
 
 
+def li_ion_price():
+    return 22  # [$/kg]
+
+
 def m2ft():
     return 3.28084
 
