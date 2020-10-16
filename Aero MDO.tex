@@ -138,7 +138,7 @@ Your text goes here.
 
 \subsection{Aerodynamics}
 
-There are currently two aerodynamic modeling methods. The first is using DATCOM, and the latter is using the Mark Drela Athena Vortex Lattice software. Note that only lifting surfaces are modeled in AVL, other components like fuselages and langing gear are modeled with DATCOM methods. The long term vision of this package is to provide four aerodynamic modeling methods, DATCOM, panel method, inviscid method (CART3D), and viscous method (SU2, Overflow, or FUN3D).
+There are currently two aerodynamic modeling methods. The first is using DATCOM, and the latter is using the Mark Drela Athena Vortex Lattice software. Note that only lifting surfaces are modeled in AVL, other components like fuselages and langing gear are modeled with DATCOM methods. The long term vision of this package is to provide four aerodynamic modeling methods, DATCOM, panel method, inviscid method (CART3D), and viscous method (SU2, Overflow, or FUN3D). The default model used is the DATCOM method. If the user wants to use the AVL method, a model should be made using the create aero model avl method in aerodynamics.py. This method will require a plane and requirements dictionary. If the model is placed in the airplane your plane directory, it will be the new default model used in analysis.
 
 \subsection{Athena Vortex Lattice}
 
