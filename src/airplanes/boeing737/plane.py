@@ -1,6 +1,6 @@
 """airplane geometry file."""
 plane = {
-    'name': 'b737',
+    'name': 'boeing737',
     'wing': {
         'type': 'wing',
         'planform': 980,  # [ft^2]
