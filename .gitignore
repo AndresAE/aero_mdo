@@ -13,3 +13,9 @@ scratch.*
 *output
 *.out
 model.txt
+*.lof
+*.ist
+*.glsdefs
+*.glo
+*.acn
+*.synctex(busy)

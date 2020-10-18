@@ -248,6 +248,7 @@ def trim_vs_nonlinear(aircraft, altitude, alpha, gamma, n=1, tol=1e-1):
         return out
 
     def v_stab(x):
+        print(x)
         u = array([0, x[0], 0, 0.01])
         x_in = array([x[1] * cos(alpha), 0, x[1] * sin(alpha), 0, alpha + deg2rad(gamma), 0, 0, 0, 0, 0, 0, altitude])
         cfm = c_f_m(aircraft, x_in, u)
@@ -255,7 +256,7 @@ def trim_vs_nonlinear(aircraft, altitude, alpha, gamma, n=1, tol=1e-1):
 
     lim_ele = aircraft['horizontal']['control_2']['limits']
     lim = ([deg2rad(lim_ele[0]), deg2rad(lim_ele[1])], [10, 500])
-    x0 = array([-0.01, 500])
+    x0 = array([deg2rad(lim_ele[0]), 500])
     u_out = minimize(obj, x0, bounds=lim, tol=tol,
                      constraints=({'type': 'eq', 'fun': v_stab}),
                      options=({'maxiter': 500}))

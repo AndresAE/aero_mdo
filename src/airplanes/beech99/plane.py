@@ -7,7 +7,7 @@ plane = {
         'aspect_ratio': 7.55,  # []
         'sweep_LE': 3,  # [deg]
         'taper': 0.46,  # []
-        'station': 16,  # [ft]
+        'station': 12.5,  # [ft]
         'buttline': 0,  # [ft]
         'waterline': 0,  # [ft]
         'incidence': 0,  # [deg]
@@ -90,7 +90,7 @@ plane = {
     'weight': {
         'weight': 7000,  # [lb]
         'inertia': [[441933, 0, 120000], [0, 821088, 0], [120000, 0, 1218803]],  # [slug*ft^2]
-        'cg': [17.2, 0, 4]  # [ft]
+        'cg': [18, 0, 4]  # [ft]
     },
     'propulsion': {
         'n_engines': 2,
@@ -107,18 +107,18 @@ plane = {
             'toe_angle': 0,  # [deg]
             'diameter': 7.5,  # [ft]
             'rpm_max': 2000,  # [rpm]
-            'pitch': 20  # [deg]
+            'pitch': 10  # [deg]
         },
         'engine_2': {
             'type': 'prop',
             'station': 11,  # [ft]
             'waterline': 1,  # [ft]
-            'buttline': -5.5,  # [ft]
+            'buttline': 5.5,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 7.5,  # [ft]
             'rpm_max': 2000,  # [rpm]
-            'pitch': 20  # [deg]
+            'pitch': 10  # [deg]
         },
     },
     'landing_gear': {
