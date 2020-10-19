@@ -92,7 +92,7 @@ Section text
 
 \subsection{A subsection}
 
-The figure below shows PAX vs. Range, with each marker sized by deliveries of each airplane. Note that there is a quasi-linear relationship between PAX and Range. THis relationship is described by equation \ref{eq:1}. Note that the error in slope is $\pm 5.7 [NM/PAX]$.
+The figure below shows PAX vs. Range, with each marker sized by deliveries of each airplane. Note that there is a quasi-linear relationship between PAX and Range. This relationship is described by equation \ref{eq:1}. Note that the error in slope is $\pm 5.7 [NM/PAX]$. Note that the aircraft in the top right corner is the Airbus A380 which, at 242 deliveries, is below the benchmark of a succesful program (300 deliveries).
 
 \begin{figure}[h]
 \begin{center}
@@ -114,9 +114,32 @@ The figure below shows PAX vs. Deliveries.
 \caption{PAX vs. Deliveries}
 \end{figure}
 
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=1\textwidth]{speed_v_range}
+\end{center}
+\caption{Cruise Speed vs. Range}
+\end{figure}
+
 \subsubsection{A sub subsection}
 
-Sub subsection text
+The assumed energy densities and efficiencies for each system are tabulated below.
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{3cm}| m{3cm} | } 
+\hline
+Type& $\eta$ & Energy Density [kWh/kg]\\ 
+\hline
+Li-Ion& 0.7 & 0.22 \\ 
+\hline
+$H_{2}$ Fuel Cell & 0.7 & 33.3 \\ 
+\hline
+Hybrid Electric & 0.4 & 11.94 \\ 
+\hline
+\end{tabular}
+\end{center}
+
+Note that the local maimum deliveries with respect to PAX is approximately 180 passengers. This results in a max range of 3300 NM using equation \ref{eq:1}. For the purposes of this analysis, 180 PAX, at 3300 NM will serve as the upper bounds. Commercial transport cruise speeds, as of 2020, are limited by aerodynaimc efficiency losses at transponic speeds. THis limit will also serve as the bound of this analysis at 450 KTAS.
 
 \subsection{Conclusion}
 

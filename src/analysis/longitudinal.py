@@ -37,7 +37,7 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
     u_0[1] = aircraft['horizontal']['control_1']['limits'][0] * pi / 180
     v_unstick = trim_vr(aircraft, x_0[-1], u_0)
     v_lof = trim_vs(aircraft, x_0[-1], 0)
-    v_rotate = 1.2 * max([v_lof, v_unstick])
+    v_rotate = 1.15 * max([v_lof, v_unstick])
     u_0[1] = 0.0
     dt = 0.01
     v = []

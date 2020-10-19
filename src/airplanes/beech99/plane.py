@@ -79,7 +79,7 @@ plane = {
     },
     'fuselage': {
         'length': 44,  # [ft]
-        'width': 5.4,  # [ft]
+        'width': 7,  # [ft]
         'height': 6,  # [ft]
         'l_cabin': 18,  # [ft]
         'l_cockpit': 5,  # [ft]
@@ -88,14 +88,14 @@ plane = {
         'seats_row': 2,
     },
     'weight': {
-        'weight': 7000,  # [lb]
+        'weight': 10400,  # [lb]
         'inertia': [[441933, 0, 120000], [0, 821088, 0], [120000, 0, 1218803]],  # [slug*ft^2]
         'cg': [18, 0, 4]  # [ft]
     },
     'propulsion': {
         'n_engines': 2,
         'const_mass': 0,
-        'fuel_mass': 2550 / 32.2,  # [slug]
+        'fuel_mass': 2244 / 32.2,  # [slug]
         'energy_density': 11.8 * 2655224 / 0.0685218,  # [ft^2 / s^2]
         'total_efficiency': 0.4,
         'engine_1': {
@@ -107,7 +107,7 @@ plane = {
             'toe_angle': 0,  # [deg]
             'diameter': 7.5,  # [ft]
             'rpm_max': 2000,  # [rpm]
-            'pitch': 10  # [deg]
+            'pitch': 20  # [deg]
         },
         'engine_2': {
             'type': 'prop',
@@ -118,7 +118,7 @@ plane = {
             'toe_angle': 0,  # [deg]
             'diameter': 7.5,  # [ft]
             'rpm_max': 2000,  # [rpm]
-            'pitch': 10  # [deg]
+            'pitch': 20  # [deg]
         },
     },
     'landing_gear': {
