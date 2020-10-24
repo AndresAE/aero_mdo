@@ -1,6 +1,7 @@
 """airplane geometry file."""
 plane = {
     'name': 'example',
+    'type': 'transport',
     'wing': {
         'type': 'wing',
         'planform': 640,  # [ft^2]
@@ -46,7 +47,7 @@ plane = {
     },
     'horizontal': {
         'type': 'wing',
-        'planform': 50.5,  # [ft^2]
+        'planform': 100,  # [ft^2]
         'aspect_ratio': 5,  # []
         'sweep_LE': 10,  # [deg]
         'taper': 0.465,  # []
@@ -74,7 +75,7 @@ plane = {
     },
     'vertical': {
         'type': 'vertical',
-        'planform': 39.2,  # [ft^2]
+        'planform': 50,  # [ft^2]
         'aspect_ratio': 4,  # []
         'sweep_LE': 20,  # [deg]
         'taper': 0.5,  # []

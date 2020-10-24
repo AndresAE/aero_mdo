@@ -208,7 +208,7 @@ def trim_alpha_de_nonlinear(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
 
     lim_ele = aircraft['horizontal']['control_2']['limits']
     lim = ([-5/57.3, aircraft['wing']['alpha_stall']/57.3], [deg2rad(lim_ele[0]), deg2rad(lim_ele[1])])
-    x0 = array([0.01, -0.01])
+    x0 = array([aircraft['wing']['alpha_stall']/57.3, deg2rad(lim_ele[0])])
     u_out = minimize(obj, x0, bounds=lim, tol=tol,
                      constraints=({'type': 'eq', 'fun': alpha_stab}),
                      options=({'maxiter': 400}))

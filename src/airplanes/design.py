@@ -14,11 +14,9 @@ from src.modeling import Fuselage, MassProperties, Propulsion
 
 
 def horizontal_tail(plane, x, u, tol=10e-4):
-    zeta_sp_req = 0.4
+    zeta_sp_req = 0.6
     dz = 1
     s_ht = plane['horizontal']['planform']
-    a = Atmosphere(x[-1]).speed_of_sound()
-    sm = static_margin(plane, x[0] / a)
     while abs(dz) > tol:
         plane['horizontal']['planform'] = s_ht
         zeta_sp, omega_sp, cap = short_period_mode(plane, x, u)
@@ -27,7 +25,7 @@ def horizontal_tail(plane, x, u, tol=10e-4):
     return s_ht
 
 
-def landing_gear_location(plane, k=0.1):
+def landing_gear_location(plane, k=0.05):
     """return landing gear coordinates."""
     theta = deg2rad(plane['wing']['alpha_stall'] + 1)
     x_cg = plane['weight']['cg'][0]
@@ -116,7 +114,7 @@ def wing_loading(plane, requirements):
 
 
 def wing_location(plane, requirements, v, altitude, tol=10e-4):
-    sm_reg = 0.05
+    sm_reg = 0.1
     a = Atmosphere(altitude).speed_of_sound()
     dx = 1
     x_w = plane['wing']['station']
@@ -135,12 +133,13 @@ plane['fuselage']['length'] = plane['fuselage']['length'] - plane['fuselage']['l
 a, b, dy, w = Fuselage(plane).cross_section()
 plane['fuselage']['height'] = 2 * a
 plane['fuselage']['width'] = 2 * b
-plane['horizontal']['station'] = plane['fuselage']['length'] - 5
-plane['vertical']['station'] = plane['fuselage']['length'] - 8
+plane['horizontal']['station'] = plane['fuselage']['length'] - 3
+plane['vertical']['station'] = plane['fuselage']['length'] - 5
 # iterative
 plane['weight']['weight'], cg = MassProperties(plane).weight_buildup(requirements)
 dw = 100
 while abs(dw) > 10:
+    print('dw = %d' % dw)
     w_i = plane['weight']['weight']
     plane['weight']['weight'], cg = MassProperties(plane).weight_buildup(requirements)
     i_xx = MassProperties(plane).i_xx_simple()

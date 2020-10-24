@@ -1,6 +1,7 @@
 """airplane geometry file."""
 plane = {
     'name': 'beech99',
+    'type': 'transport',
     'wing': {
         'type': 'wing',
         'planform': 280,  # [ft^2]
