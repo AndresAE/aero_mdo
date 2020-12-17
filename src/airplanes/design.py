@@ -13,16 +13,31 @@ from src.modeling.aerodynamics import polhamus
 from src.modeling import Fuselage, MassProperties, Propulsion
 
 
-def horizontal_tail(plane, x, u, tol=10e-4):
-    zeta_sp_req = 0.6
-    dz = 1
-    s_ht = plane['horizontal']['planform']
-    while abs(dz) > tol:
-        plane['horizontal']['planform'] = s_ht
-        zeta_sp, omega_sp, cap = short_period_mode(plane, x, u)
-        dz = zeta_sp - zeta_sp_req
-        s_ht = s_ht * (1 - float(dz))
-    return s_ht
+def longitudinal_sizing(plane, req, s, u, tol=10e-1):
+    v = (s[0] ** 2 + s[2] ** 2) ** 0.5
+    a = Atmosphere(s[-1]).speed_of_sound()
+    zeta_req = req['stability_and_control']['zeta_sp']
+    sm_req = req['stability_and_control']['sm']
+
+    def obj(x):
+        obj = plane['horizontal']['planform']
+        return obj
+
+    def long_constraint(x):
+        plane['wing']['station'] = x[0]
+        plane['horizontal']['planform'] = x[1]
+        plane['weight']['weight'], plane['weight']['cg'] = MassProperties(plane).weight_buildup(req)
+        sm = static_margin(plane, v / a)
+        zeta_sp, omega_sp, cap = short_period_mode(plane, s, u)
+        c = array([sm - sm_req, zeta_sp - zeta_req])
+        return c
+
+    lim = ([0, plane['fuselage']['length']], [0.1, plane['wing']['planform']])
+    x0 = array([plane['wing']['station'], plane['horizontal']['planform']])
+    u_out = minimize(obj, x0, bounds=lim, tol=tol,
+                     constraints=({'type': 'eq', 'fun': long_constraint}),
+                     options=({'maxiter': 200}))
+    return u_out['x']
 
 
 def landing_gear_location(plane, k=0.05):
@@ -68,9 +83,9 @@ def propulsion_sizing(plane, thrust, speed, altitude, tol=10e-4):
     return u_out['x']
 
 
-def vertical_tail(plane, x, u, tol=10e-4):
-    zeta_dr_req = 0.4
-    c_n_b_reg = 0.03
+def vertical_tail(plane, req, x, u, tol=10e-4):
+    zeta_dr_req = req['stability_and_control']['zeta_dr']
+    c_n_b_req = req['stability_and_control']['c_n_b']
     alpha = arctan(x[2] / x[0])
     a = Atmosphere(x[-1]).speed_of_sound()
     dz = 1
@@ -85,7 +100,7 @@ def vertical_tail(plane, x, u, tol=10e-4):
     while abs(dc) > tol:
         plane['vertical']['planform'] = s_vt_ds
         c_n_b = directional_stability(plane, x[0] / a, alpha)
-        dc = c_n_b - c_n_b_reg
+        dc = c_n_b - c_n_b_req
         s_vt_ds = s_vt_ds * (1 - float(dc))
     return max([s_vt_dr, s_vt_ds])
 
@@ -133,8 +148,6 @@ plane['fuselage']['length'] = plane['fuselage']['length'] - plane['fuselage']['l
 a, b, dy, w = Fuselage(plane).cross_section()
 plane['fuselage']['height'] = 2 * a
 plane['fuselage']['width'] = 2 * b
-plane['horizontal']['station'] = plane['fuselage']['length'] - 3
-plane['vertical']['station'] = plane['fuselage']['length'] - 5
 # iterative
 plane['weight']['weight'], cg = MassProperties(plane).weight_buildup(requirements)
 dw = 100
@@ -150,19 +163,29 @@ while abs(dw) > 10:
     plane['weight']['inertia'] = [[i_xx, 0, i_xz], [0, i_yy, 0], [i_xz, 0, i_zz]]
     plane['wing']['planform'] = plane['weight']['weight'] / w_s
     t = plane['weight']['weight'] * t_w
-    out_prop = propulsion_sizing(plane, array([t, t, t]), array([100, 200, 300]), array([0, 20000, 20000]), tol=10e-4)
+    thrust = array([t * Atmosphere(0).air_density() / 0.00238,
+                    t * Atmosphere(20000).air_density() / 0.00238,
+                    t * Atmosphere(20000).air_density() / 0.00238])
+    out_prop = propulsion_sizing(plane, thrust, array([100, 200, 300]), array([0, 20000, 20000]), tol=10e-4)
     for ii in range(0, plane['propulsion']['n_engines']):
         plane['propulsion']["engine_%d" % (ii + 1)]['pitch'] = out_prop[0]
         plane['propulsion']["engine_%d" % (ii + 1)]['diameter'] = out_prop[1]
         plane['propulsion']["engine_%d" % (ii + 1)]['rpm_max'] = out_prop[2]
+
     plane['wing']['station'],  plane['weight']['cg'] = wing_location(plane, requirements, 300, 20000)
     x_ng, x_mg, y_mg, l_g = landing_gear_location(plane)
+
+    plane['horizontal']['station'] = x_mg + \
+                                     plane['horizontal']['waterline'] / tan(deg2rad(plane['wing']['alpha_stall']+2))
+    plane['vertical']['station'] = plane['horizontal']['station'] - 2
 
     c = trim_alpha_de_nonlinear(plane, 300, 20000, 0)
     u = [0, deg2rad(c[0]), 0, 1]
     x = array([float(300 * cos(deg2rad(c[1]))), 0, float(300 * sin(deg2rad(c[1]))), 0, float(deg2rad(c[1])), 0, 0, 0, 0, 0, 0, 20000])
-    plane['horizontal']['planform'] = horizontal_tail(plane, x, u)
-    plane['vertical']['planform'] = vertical_tail(plane, x, u)
+    out = longitudinal_sizing(plane, requirements, x, u)
+    plane['wing']['station'] = out[0]
+    plane['horizontal']['planform'] = out[1]
+    plane['vertical']['planform'] = vertical_tail(plane, requirements, x, u)
     plane['weight']['weight'], cg = MassProperties(plane).weight_buildup(requirements)
     dw = w_i - plane['weight']['weight']
 

@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 from numpy import array, ceil, cos, deg2rad, pi
 from src.common import Atmosphere, Earth, constants
 from src.modeling import LiftingSurface
@@ -49,7 +50,7 @@ class MassProperties:
         i_xz = ((w / g) * (0.3 * b / 2) ** 2) / 3
         return i_xz
 
-    def weight_buildup(self, requirements, tol=10e-2):
+    def weight_buildup(self, requirements, tol=10e-2, iplot=False):
         """return component buildup mass properties."""
         mtow = self.aircraft['weight']['weight']
         aircraft = self.aircraft
@@ -85,6 +86,21 @@ class MassProperties:
             mtow_out = w_iter + w_fixed
             res = mtow - mtow_out
             mtow = mtow_out
+
+        w_payload = w_pax + w_car
+        w_af = mtow - w_payload - w_prp - w_ful
+
+        if iplot:
+            # Pie chart, where the slices will be ordered and plotted counter-clockwise:
+            labels = 'airframe', 'prop', 'fuel', 'cargo'
+            sizes = [w_af, w_prp, w_ful, w_payload]
+
+            fig1, ax1 = plt.subplots()
+            ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+                    shadow=True, startangle=90)
+            ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+            plt.show()
+
         p_prp = array([aircraft['wing']['station'], 0, aircraft['wing']['waterline']])
         p_w = array([LiftingSurface(aircraft['wing']).aerodynamic_center(c=0.5), aircraft['wing']['buttline'],
                      aircraft['wing']['waterline']])

@@ -2,6 +2,7 @@
 from numpy import arcsin, array, cos, deg2rad, linalg, ones, rad2deg, sin, sqrt
 from scipy.optimize import minimize, Bounds
 from src.common import Atmosphere
+from src.common import Earth
 from src.common.rotations import body_to_wind
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import c_f_m, landing_gear_loads
@@ -214,6 +215,41 @@ def trim_alpha_de_nonlinear(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
                      options=({'maxiter': 400}))
     c = rad2deg(u_out['x'])
     aircraft['weight']['weight'] = w_in
+    return c
+
+
+def trim_vfs(aircraft, altitude, tol=1e-1):
+    """trim nonlinear aircraft to best rate of climb."""
+    th = 1
+    g = Earth(altitude).gravity()
+
+    def obj(x):
+        u = array([0, x[1], 0, th])
+        speed = x[2]
+        x = array([speed * cos(x[0]), 0, speed * sin(x[0]), 0, x[0], 0, 0, 0, 0, 0, 0, altitude])
+        c_1 = c_f_m(aircraft, x, u)
+        throttle = ones(aircraft['propulsion']['n_engines'])
+        tsfc = g * speed / (aircraft['propulsion']['energy_density'] * aircraft['propulsion']['total_efficiency'])
+        t = Propulsion(aircraft['propulsion'], x, throttle, aircraft['weight']['cg']).thrust_f_m()
+        f_s = tsfc * t[0]
+        p_s = (c_1[0]) * speed * 60 / aircraft['weight']['weight']  # [ft/min]
+        return f_s / p_s
+
+    def alpha_stab(x):
+        u = array([0, x[1], 0, th])
+        speed = x[2]
+        x = array([speed * cos(x[0]), 0, speed * sin(x[0]), 0, x[0], 0, 0, 0, 0, 0, 0, altitude])
+        cfm = c_f_m(aircraft, x, u)
+        return abs(cfm[2]) + abs(cfm[4])
+
+    lim_ele = aircraft['horizontal']['control_2']['limits']
+    lim = ([-5/57.3, aircraft['wing']['alpha_stall']/57.3], [deg2rad(lim_ele[0]), deg2rad(lim_ele[1])], [0.1, 1000])
+    x0 = array([0.01, -0.01, 20])
+    u_out = minimize(obj, x0, bounds=lim, tol=tol,
+                     constraints=({'type': 'eq', 'fun': alpha_stab}),
+                     options=({'maxiter': 200}))
+    c = u_out['x']
+    c[0:2] = rad2deg(c[0:2])
     return c
 
 
