@@ -39,7 +39,7 @@ def elevator(plane, req, tol=10e-1):
                        options=({'maxiter': 200}))
     plane['weight']['weight'] = w
     u = [0, de, 0, 0.01]
-    vr = req['performance']['stall_speed'] * 1.1
+    vr = req['performance']['stall_speed'] * 1.15
 
     def obj(x):
         return x[0]
@@ -93,7 +93,7 @@ def longitudinal_sizing(plane, req, s, u, tol=10e-1):
     return u_out['x']
 
 
-def landing_gear_location(plane, k=0.05):
+def landing_gear_location(plane, k=0.07):
     """return landing gear coordinates."""
     theta = deg2rad(plane['wing']['alpha_stall'] + 1)
     x_cg = plane['weight']['cg'][0]
@@ -105,7 +105,7 @@ def landing_gear_location(plane, k=0.05):
                 sin(theta) / cos(theta) + cos(theta) / sin(theta))
     h_lg = (x_lg - x_cg) / tan(theta) - z_cg
     x_ng = (x_cg - x_lg) / k + x_lg
-    y_lg = plane['fuselage']['width'] / 2
+    y_lg = max([plane['fuselage']['width'] / 2, abs(plane['propulsion']['engine_1']['buttline'])])
     return x_ng, x_lg, y_lg, h_lg
 
 
@@ -213,24 +213,35 @@ def dihedral(plane, req):
     phi = deg2rad(req['stability_and_control']['lto_roll_angle'])
     for ii in range(0, plane['propulsion']['n_engines']):
         b = trapezoidal_wing.span(plane['wing']['aspect_ratio'], plane['wing']['planform'])
-        z_tip = (b / 2 - y_lg) * tan(phi) + plane['wing']['waterline']
+        z_tip = (b / 2 - y_lg) * tan(phi) - plane['wing']['waterline']
         dihedral = max([rad2deg(arctan(z_tip / (b / 2))), 0])
     return dihedral
 
 
 # fixed
+wing_height = 'high'
+tail = 'T'
+engine = 'wing_mounted'
+
 l_cab = Fuselage(plane).far_25_length()
 plane['fuselage']['length'] = plane['fuselage']['length'] - plane['fuselage']['l_cabin'] + l_cab
+plane['fuselage']['l_cabin'] = l_cab
 a, b, dy, w = Fuselage(plane).cross_section()
 plane['fuselage']['height'] = 2 * a
 plane['fuselage']['width'] = 2 * b
-# iterative
 plane['weight']['weight'], cg = MassProperties(plane).weight_buildup(requirements)
 plane['horizontal']['station'] = plane['fuselage']['length'] - 3
 plane['vertical']['station'] = plane['fuselage']['length'] - 5
-plane['horizontal']['waterline'] = plane['fuselage']['height']
-plane['vertical']['waterline'] = plane['fuselage']['height']
+plane['horizontal']['waterline'] = plane['fuselage']['height']-2
+plane['vertical']['waterline'] = plane['fuselage']['height']-2
+if wing_height == 'low':
+    plane['wing']['waterline'] = 0
+else:
+    plane['wing']['waterline'] = plane['fuselage']['height']
+
+
 dw = 100
+# iterative
 while abs(dw) > 10:
     print('dw = %d' % dw)
     w_i = plane['weight']['weight']
@@ -250,20 +261,31 @@ while abs(dw) > 10:
     for ii in range(0, plane['propulsion']['n_engines']):
         plane['propulsion']["engine_%d" % (ii + 1)]['pitch'] = out_prop[0]
         plane['propulsion']["engine_%d" % (ii + 1)]['diameter'] = out_prop[1]
-        plane['propulsion']["engine_%d" % (ii + 1)]['rpm_max'] = out_prop[2]
+        plane['propulsion']["engine_%d" % (ii + 1)]['rpm_max'] = out_prop[2]*1000
 
     plane['wing']['station'],  plane['weight']['cg'] = wing_location(plane, requirements, 300, 20000)
+    if tail == 'T':
+        plane['horizontal']['waterline'] = plane['vertical']['waterline'] + trapezoidal_wing.span(
+            plane['vertical']['aspect_ratio'], plane['vertical']['planform'], mirror=0)
+    else:
+        plane['horizontal']['waterline'] = plane['vertical']['waterline']
+
     engine_height(plane, requirements)
     plane['wing']['dihedral'] = dihedral(plane, requirements)
-    for ii in range(0, plane['propulsion']['n_engines']):
-        plane['propulsion']["engine_%d" % (ii + 1)]['station'] = plane['wing']['station']
+    if engine == 'wing_mounted':
+        for ii in range(0, plane['propulsion']['n_engines']):
+            plane['propulsion']["engine_%d" % (ii + 1)]['station'] = plane['wing']['station']
+    elif engine == 'fuselage_mounted':
+        for ii in range(0, plane['propulsion']['n_engines']):
+            plane['propulsion']["engine_%d" % (ii + 1)]['station'] = l_cab + plane['fuselage']['l_cockpit'] + 5
+
     x_ng, x_mg, y_mg, l_g = landing_gear_location(plane)
     plane['landing_gear']['nose'] = [x_ng, 0, -l_g]
     plane['landing_gear']['main'] = [x_mg, y_mg, -l_g]
 
-    plane['horizontal']['station'] = x_mg + \
+    plane['horizontal']['station'] = min([x_mg + \
                                      (plane['horizontal']['waterline'] + l_g) \
-                                     / tan(deg2rad(plane['wing']['alpha_stall']+2))
+                                     / tan(deg2rad(plane['wing']['alpha_stall']+2)), plane['fuselage']['length']-3])
     plane['vertical']['station'] = plane['horizontal']['station'] - 2
 
     c = trim_alpha_de_nonlinear(plane, 300, 20000, 0)

@@ -67,7 +67,7 @@ def print_wing(wing):
 
 
 def print_vt(wing):
-    b = span(wing['aspect_ratio'], wing['planform'])
+    b = span(wing['aspect_ratio'], wing['planform'], mirror=0)
     c_r = root_chord(wing['aspect_ratio'], wing['planform'], wing['taper'])
     c_t = c_r * wing['taper']
     x = wing['station'] + array([0, b/2*tan(deg2rad(wing['sweep_LE'])), b/2*tan(deg2rad(wing['sweep_LE'])) + c_t,
@@ -116,7 +116,7 @@ def print_tire(r):
 
 
 def print_fuselage(fuselage):
-    theta_cockpit = 15
+    theta_cockpit = 45
     theta_tailstrike = 12
     l_tail = fuselage['length'] - fuselage['l_cabin'] - fuselage['l_cockpit']
     x = array([0, fuselage['l_cockpit'], fuselage['l_cockpit'] + fuselage['l_cabin'], fuselage['length'],
@@ -126,5 +126,5 @@ def print_fuselage(fuselage):
                fuselage['height'],
                fuselage['height'],
                l_tail * tan(deg2rad(theta_tailstrike)),
-               0, 0, fuselage['height'] - theta_cockpit * tan(deg2rad(theta_cockpit))])
+               0, 0, fuselage['height'] - fuselage['l_cockpit'] * tan(deg2rad(theta_cockpit))])
     return x, y, z

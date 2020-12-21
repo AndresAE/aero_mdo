@@ -61,8 +61,9 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
         t = t + dt
         t_out.append(t)
     x_rto = x
-    u_0[1] = aircraft['horizontal']['control_1']['limits'][0] * pi / 180
+
     while pitch[-1] < aircraft['wing']['alpha_stall'] - rotate_margin:
+        u_0[1] = -2*((aircraft['wing']['alpha_stall'] - 2) - pitch[-1])*pi/180
         dxdt = takeoff_ground_roll(aircraft, x, u_0)
         p = p + x * dt + 0.5 * dxdt * dt ** 2
         x = x + dxdt * dt
@@ -97,6 +98,10 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
     v_rto_i = f_rto_i(array(s[0:int(floor(len(s) * 0.7))]))
     f_1 = InterpolatedUnivariateSpline(v[0:int(floor(len(s) * 0.7))] - v_rto_i, v[0:int(floor(len(s) * 0.7))])
     v_1 = f_1(0)
+
+    plt.plot(s_rto, v_rto)
+    plt.xlim([0, 5000])
+    plt.ylim([0, 400])
 
     plt.figure(figsize=(10, 8))
     plt.subplot(3, 1, 1)
@@ -231,7 +236,7 @@ def plot_sp():
     plt.yscale("log")
 
 
-def rejected_takeoff(aircraft, s_f, x_0, u_0, v_max=400):
+def rejected_takeoff(aircraft, s_f, x_0, u_0, v_max=350):
     """return derivatives for aircraft on ground."""
     v = linspace(5, v_max, 100)
     m = aircraft['weight']['weight']/g

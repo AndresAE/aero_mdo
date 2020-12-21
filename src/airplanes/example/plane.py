@@ -4,15 +4,15 @@ plane = {
     'type': 'transport',
     'wing': {
         'type': 'wing',
-        'planform': 693.5,  # [ft^2]
+        'planform': 738.7,  # [ft^2]
         'aspect_ratio': 5,  # []
         'sweep_LE': 0,  # [deg]
         'taper': 0.5,  # []
-        'station': 23.46,  # [ft]
+        'station': 28.43,  # [ft]
         'buttline': 0,  # [ft]
         'waterline': 1,  # [ft]
         'incidence': 0,  # [deg]
-        'dihedral': 0,  # [deg]
+        'dihedral': 4.51,  # [deg]
         'airfoil': '4412',  # [naca airfoils]
         'alpha_stall': 12,  # [deg]
         'n_controls': 4,  # []
@@ -47,13 +47,13 @@ plane = {
     },
     'horizontal': {
         'type': 'wing',
-        'planform': 80,  # [ft^2]
+        'planform': 138.2,  # [ft^2]
         'aspect_ratio': 3,  # []
         'sweep_LE': 20,  # [deg]
         'taper': 0.465,  # []
-        'station': 60.87,  # [ft]
+        'station': 73.63,  # [ft]
         'buttline': 0,  # [ft]
-        'waterline': 5,  # [ft]
+        'waterline': 12.98,  # [ft]
         'incidence': 0,  # [deg]
         'dihedral': 0,  # [deg]
         'airfoil': '0012',  # [naca airfoils]
@@ -75,13 +75,13 @@ plane = {
     },
     'vertical': {
         'type': 'vertical',
-        'planform': 34.4,  # [ft^2]
-        'aspect_ratio': 2,  # []
+        'planform': 33.1,  # [ft^2]
+        'aspect_ratio': 3,  # []
         'sweep_LE': 30,  # [deg]
-        'taper': 0.5,  # []
-        'station': 58.87,  # [ft]
+        'taper': 1,  # []
+        'station': 71.63,  # [ft]
         'buttline': 0,  # [ft]
-        'waterline': 5,  # [ft]
+        'waterline': 5.91,  # [ft]
         'airfoil': '0012',  # [naca airfoils]
         'n_controls': 1,
         'control_1': {
@@ -93,98 +93,54 @@ plane = {
         },
     },
     'fuselage': {
-        'length': 63.3,  # [ft]
+        'length': 76.63,  # [ft]
         'width': 6,  # [ft]
         'height': 8,  # [ft]
-        'l_cabin': 30,  # [ft]
+        'l_cabin': 43.33,  # [ft]
         'l_cockpit': 5,  # [ft]
-        'pax': 30,
+        'pax': 40,
         'lavatories': 0,
         'seats_row': 2,
     },
     'weight': {
-        'weight': 24975,  # [lb]
-        'inertia': [[68000, 0, 22671], [0, 36474, 0], [22671, 0, 90712]],  # [slug*ft^2]
-        'cg': [28.75, 0, 3.8]  # [ft]
+        'weight': 26605,  # [lb]
+        'inertia': [[68989, 0, 22996], [0, 109360, 0], [22996, 0, 156745]],  # [slug*ft^2]
+        'cg': [35.52, 0, 3.8]  # [ft]
     },
     'propulsion': {
-        'n_engines': 6,
+        'n_engines': 2,
         'const_mass': 1,
         'fuel_mass': 6000 / 32.2,  # [slug]
         'energy_density': 12.2 * 2655224 / 0.0685218,  # [ft^2 / s^2]
         'total_efficiency': 0.4,
         'engine_1': {
             'type': 'prop',
-            'station': 24,  # [ft]
-            'waterline': 1,  # [ft]
-            'buttline': -40,  # [ft]
+            'station': 28.4,  # [ft]
+            'waterline': 3,  # [ft]
+            'buttline': -12,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
-            'diameter': 2,  # [ft]
-            'rpm_max': 10000,  # [rpm]
-            'pitch': 1  # [deg]
+            'diameter': 6,  # [ft]
+            'rpm_max': 6500,  # [rpm]
+            'pitch': 21.7  # [deg]
         },
         'engine_2': {
             'type': 'prop',
-            'station': 24,  # [ft]
-            'waterline': 1,  # [ft]
-            'buttline': -30,  # [ft]
+            'station': 28.4,  # [ft]
+            'waterline': 3,  # [ft]
+            'buttline': 12,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
-            'diameter': 2,  # [ft]
-            'rpm_max': 10000,  # [rpm]
-            'pitch': 1  # [deg]
-        },
-        'engine_3': {
-            'type': 'prop',
-            'station': 24,  # [ft]
-            'waterline': 1,  # [ft]
-            'buttline': -20,  # [ft]
-            'thrust_angle': 0,  # [deg]
-            'toe_angle': 0,  # [deg]
-            'diameter': 2,  # [ft]
-            'rpm_max': 10000,  # [rpm]
-            'pitch': 1  # [deg]
-        },
-        'engine_4': {
-            'type': 'prop',
-            'station': 24,  # [ft]
-            'waterline': 1,  # [ft]
-            'buttline': 20,  # [ft]
-            'thrust_angle': 0,  # [deg]
-            'toe_angle': 0,  # [deg]
-            'diameter': 2,  # [ft]
-            'rpm_max': 10000,  # [rpm]
-            'pitch': 1  # [deg]
-        },
-        'engine_5': {
-            'type': 'prop',
-            'station': 24,  # [ft]
-            'waterline': 1,  # [ft]
-            'buttline': 30,  # [ft]
-            'thrust_angle': 0,  # [deg]
-            'toe_angle': 0,  # [deg]
-            'diameter': 2,  # [ft]
-            'rpm_max': 10000,  # [rpm]
-            'pitch': 1  # [deg]
-        },
-        'engine_6': {
-            'type': 'prop',
-            'station': 24,  # [ft]
-            'waterline': 1,  # [ft]
-            'buttline': 40,  # [ft]
-            'thrust_angle': 0,  # [deg]
-            'toe_angle': 0,  # [deg]
-            'diameter': 2,  # [ft]
-            'rpm_max': 10000,  # [rpm]
-            'pitch': 1  # [deg]
+            'diameter': 6,  # [ft]
+            'rpm_max': 6500,  # [rpm]
+            'pitch': 21.7  # [deg]
         },
     },
     'landing_gear': {
-        'nose': [13.3, 0, -1],  # [ft]
+        'nose': [4.7, 0, -3.2],  # [ft]
         'nose_diameter': 1,  # [ft]
         'nose_width': 0.5,  # [ft]
-        'main': [30.12, 3, -1],  # [ft], left (mirrored on the right)
+        'main': [37.15, 3, -3.2],  # [ft], left (mirrored on the right)
         'main_diameter': 1.5,  # [ft]
         'main_width': 1.5,  # [ft]
         'mu_roll': 0.02,
@@ -206,9 +162,9 @@ requirements = {
     },
     'stability_and_control': {
         'c_n_b': 0.05,  # [1/deg]
-        'sm': 0.005,  # [% mac]
-        'zeta_dr': 0.4,
-        'zeta_sp': 0.4,
+        'sm': 0.05,  # [% mac]
+        'zeta_dr': 0.6,
+        'zeta_sp': 0.6,
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]
         'crosswind': 15,  # [ft/s]

@@ -101,7 +101,8 @@ class MassProperties:
             ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
             plt.show()
 
-        p_prp = array([aircraft['wing']['station'], 0, aircraft['wing']['waterline']])
+        p_prp = array([aircraft['propulsion']['engine_1']['station'], 0,
+                       aircraft['propulsion']['engine_1']['waterline']])
         p_w = array([LiftingSurface(aircraft['wing']).aerodynamic_center(c=0.5), aircraft['wing']['buttline'],
                      aircraft['wing']['waterline']])
         p_ht = array([LiftingSurface(aircraft['horizontal']).aerodynamic_center(c=0.5),
@@ -112,7 +113,15 @@ class MassProperties:
         p_ng = array([aircraft['landing_gear']['nose'][0], aircraft['landing_gear']['nose'][1],
                       aircraft['landing_gear']['nose'][2] / 2])
         p_fus = array([aircraft['fuselage']['length'] / 2, 0, aircraft['fuselage']['width']])
-        w_r = (p_w * (w_fcs + w_w + w_ful) + p_prp * w_prp +
+
+        wp_prp = array([0, 0, 0])
+        for ii in range(0, aircraft['propulsion']['n_engines']):
+            x = aircraft['propulsion']["engine_%d" % (ii + 1)]['station']*w_prp/aircraft['propulsion']['n_engines']
+            y = aircraft['propulsion']["engine_%d" % (ii + 1)]['buttline']*w_prp/aircraft['propulsion']['n_engines']
+            z = aircraft['propulsion']["engine_%d" % (ii + 1)]['waterline']*w_prp/aircraft['propulsion']['n_engines']
+            wp_prp = wp_prp + array([x, y, z])
+
+        w_r = (p_w * (w_fcs + w_w + w_ful) + wp_prp +
                p_ht * w_ht + p_vt * w_vt + p_mg * w_mg + p_ng * w_ng +
                p_fus * (w_fus + w_avi + w_ele + w_pnt + w_pax))
         cg = w_r / mtow

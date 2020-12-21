@@ -55,8 +55,8 @@ def report_sweep(plane, requirements):
         i_mach = 0
         # altitude iterative
         # stability and control
-        trim_vx(plane, alt_i)
-        trim_vy(plane, alt_i)
+        #trim_vx(plane, alt_i)
+        #trim_vy(plane, alt_i)
 
         for mach_i in machs:
             a = Atmosphere(alt_i).speed_of_sound()
