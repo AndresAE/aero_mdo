@@ -8,10 +8,21 @@ from src.analysis.constraint import takeoff, master_constraint, stall_speed
 from src.analysis.longitudinal import short_period_mode, static_margin
 from src.analysis.lateral_directional import directional_stability, dutch_roll_mode
 from src.analysis.trim import trim_alpha_de_nonlinear
-from src.common import Atmosphere
+from src.common import Atmosphere, Earth, constants
 from src.modeling.aerodynamics import polhamus
-from src.modeling import Fuselage, MassProperties, Propulsion, trapezoidal_wing
+from src.modeling import Aircraft, Fuselage, MassProperties, Propulsion, trapezoidal_wing
 from src.modeling.force_model import c_f_m, landing_gear_loads
+g = Earth(0).gravity()
+
+
+def dihedral(plane, req):
+    y_lg = plane['landing_gear']['main'][1]
+    phi = deg2rad(req['stability_and_control']['lto_roll_angle'])
+    for ii in range(0, plane['propulsion']['n_engines']):
+        b = trapezoidal_wing.span(plane['wing']['aspect_ratio'], plane['wing']['planform'])
+        z_tip = (b / 2 - y_lg) * tan(phi) - plane['wing']['waterline']
+        dihedral = max([rad2deg(arctan(z_tip / (b / 2))), 0])
+    return dihedral
 
 
 def elevator(plane, req, tol=10e-1):
@@ -60,6 +71,38 @@ def elevator(plane, req, tol=10e-1):
     return max([u_out_1['x'][1], u_out_2['x'][0]])
 
 
+def engine_height(plane, req):
+    y_lg = plane['landing_gear']['main'][1]
+    phi = deg2rad(req['stability_and_control']['lto_roll_angle'])
+    for ii in range(0, plane['propulsion']['n_engines']):
+        y_eng = plane['propulsion']["engine_%d" % (ii + 1)]['buttline']
+        d = plane['propulsion']["engine_%d" % (ii + 1)]['diameter']
+        z_eng = (abs(y_eng) - y_lg) * tan(phi) + d / 2
+        plane['propulsion']["engine_%d" % (ii + 1)]['waterline'] = max([
+            plane['propulsion']["engine_%d" % (ii + 1)]['waterline'], z_eng])
+    return
+
+
+def landing_gear_location(plane, k=0.07, mount='fuselage'):
+    """return landing gear coordinates."""
+    theta = deg2rad(plane['wing']['alpha_stall'] + 1)
+    x_cg = plane['weight']['cg'][0]
+    z_cg = plane['weight']['cg'][2]
+    # fuselage impact points
+    z_fus = min([plane['horizontal']['waterline'], plane['vertical']['waterline']])
+    x_fus = max([plane['horizontal']['station'], plane['vertical']['station'], plane['fuselage']['length']])
+    x_lg = (cos(theta) / sin(theta) * x_cg + z_cg - z_fus + sin(theta) / cos(theta) * x_fus) / (
+            sin(theta) / cos(theta) + cos(theta) / sin(theta))
+    h_lg = (x_lg - x_cg) / tan(theta) - z_cg
+    x_ng = (x_cg - x_lg) / k + x_lg
+    if mount == 'fuselage':
+        y_lg = plane['fuselage']['width'] / 2 + 1
+    elif mount == 'nacelle':
+        y_lg = plane['propulsion']['engine_1']['buttline']
+
+    return x_ng, x_lg, y_lg, h_lg
+
+
 def longitudinal_sizing(plane, req, s, u, tol=10e-1):
     v = (s[0] ** 2 + s[2] ** 2) ** 0.5
     a = Atmosphere(s[-1]).speed_of_sound()
@@ -93,22 +136,6 @@ def longitudinal_sizing(plane, req, s, u, tol=10e-1):
     return u_out['x']
 
 
-def landing_gear_location(plane, k=0.07):
-    """return landing gear coordinates."""
-    theta = deg2rad(plane['wing']['alpha_stall'] + 1)
-    x_cg = plane['weight']['cg'][0]
-    z_cg = plane['weight']['cg'][2]
-    # fuselage impact points
-    z_fus = min([plane['horizontal']['waterline'], plane['vertical']['waterline']])
-    x_fus = max([plane['horizontal']['station'], plane['vertical']['station'], plane['fuselage']['length']])
-    x_lg = (cos(theta) / sin(theta) * x_cg + z_cg - z_fus + sin(theta) / cos(theta) * x_fus) / (
-                sin(theta) / cos(theta) + cos(theta) / sin(theta))
-    h_lg = (x_lg - x_cg) / tan(theta) - z_cg
-    x_ng = (x_cg - x_lg) / k + x_lg
-    y_lg = max([plane['fuselage']['width'] / 2, abs(plane['propulsion']['engine_1']['buttline'])])
-    return x_ng, x_lg, y_lg, h_lg
-
-
 def propulsion_sizing(plane, thrust, speed, altitude, tol=10e-4):
     prop = plane['propulsion']
     throttle = ones(plane['propulsion']['n_engines'])
@@ -133,6 +160,53 @@ def propulsion_sizing(plane, thrust, speed, altitude, tol=10e-4):
                      constraints=({'type': 'ineq', 'fun': thrust_constraint}),
                      options=({'maxiter': 200}))
     return u_out['x']
+
+
+def range_iter(plane, req):
+    sigma = plane['propulsion']['energy_density']
+    eta = plane['propulsion']['total_efficiency']
+    r = req['performance']['range']
+    m_cruise = req['performance']['cruise_mach']
+    alt_cruise = req['performance']['cruise_altitude']
+    hold = 5 * 60  # [sec]
+    divert = 45 * 60  # [sec]
+    e = plane['wing']['aspect_ratio'] / (2 + plane['wing']['aspect_ratio'])
+    l_d = 0.5 * (pi * plane['wing']['aspect_ratio'] * e / Aircraft(plane, m_cruise).c_d_zero(alt_cruise))**0.5
+    w = plane['weight']['weight']
+    delta = 10
+    fuel_weight = 0
+    while delta > 1:
+        m_fuel = w / (l_d * sigma * eta) * (r * constants.ft2nm() + (hold + divert) * (m_cruise * Atmosphere(alt_cruise).speed_of_sound()))
+        fuel_weight = g * m_fuel * 1.15
+        w_out = plane['weight']['weight'] - plane['propulsion']['fuel_mass'] * g + fuel_weight
+        delta = abs(w - w_out)
+        w = w_out
+    return fuel_weight
+
+
+def rudder(plane, req, tol=10e-1):
+    alt = req['flight_envelope']['altitude'][1]
+    alpha = plane['wing']['alpha_stall'] + 2
+    dr = deg2rad(plane['vertical']['control_1']['limits'][0])
+
+    def obj(x):
+        return x[0]
+
+    def oei_constraint(x):
+        v = x[0]
+        plane['vertical']['control_1']['cf_c'] = x[1]
+        s = array([float(v * cos(deg2rad(alpha))), 0, float(v * sin(deg2rad(alpha))), 0, float(deg2rad(alpha)), 0, 0, 0, 0, 0, 0, 0])
+        u = [0, deg2rad(x[2]), dr, 1]
+        cfm = c_f_m(plane, s, u, engine_out=True)
+        return abs(cfm[2])+abs(cfm[4])+abs(cfm[5])
+
+    lim = ([5, 1000], [0, 1], plane['horizontal']['control_1']['limits'])
+    x0 = array([10, plane['horizontal']['control_1']['cf_c'], 0])
+    u_out = minimize(obj, x0, bounds=lim, tol=tol,
+                     constraints=({'type': 'eq', 'fun': oei_constraint}),
+                     options=({'maxiter': 200}))
+
+    return u_out['x'][1]
 
 
 def vertical_tail(plane, req, x, u, tol=10e-4):
@@ -196,32 +270,22 @@ def wing_location(plane, requirements, v, altitude, tol=10e-4):
     return x_w, plane['weight']['cg']
 
 
-def engine_height(plane, req):
-    y_lg = plane['landing_gear']['main'][1]
-    phi = deg2rad(req['stability_and_control']['lto_roll_angle'])
-    for ii in range(0, plane['propulsion']['n_engines']):
-        y_eng = plane['propulsion']["engine_%d" % (ii + 1)]['buttline']
-        d = plane['propulsion']["engine_%d" % (ii + 1)]['diameter']
-        z_eng = (abs(y_eng) - y_lg) * tan(phi) + d / 2
-        plane['propulsion']["engine_%d" % (ii + 1)]['waterline'] = max([
-            plane['propulsion']["engine_%d" % (ii + 1)]['waterline'], z_eng])
-    return
-
-
-def dihedral(plane, req):
-    y_lg = plane['landing_gear']['main'][1]
-    phi = deg2rad(req['stability_and_control']['lto_roll_angle'])
-    for ii in range(0, plane['propulsion']['n_engines']):
-        b = trapezoidal_wing.span(plane['wing']['aspect_ratio'], plane['wing']['planform'])
-        z_tip = (b / 2 - y_lg) * tan(phi) - plane['wing']['waterline']
-        dihedral = max([rad2deg(arctan(z_tip / (b / 2))), 0])
-    return dihedral
-
-
 # fixed
 wing_height = 'high'
-tail = 'T'
+tail = 'conventional'
 engine = 'wing_mounted'
+landing_gear = 'fuselage'
+propulsion = 'h2'
+
+if propulsion == 'h2':
+    plane['propulsion']['total_efficiency'] = constants.energy_density_h2() * 2655224 / 0.0685218
+    plane['propulsion']['energy_density'] = constants.eta_electric()
+elif propulsion == 'battery':
+    plane['propulsion']['total_efficiency'] = constants.energy_density_li_ion() * 2655224 / 0.0685218
+    plane['propulsion']['energy_density'] = constants.eta_electric()
+elif propulsion == 'turboprop':
+    plane['propulsion']['total_efficiency'] = constants.energy_density_jet_a() * 2655224 / 0.0685218
+    plane['propulsion']['energy_density'] = constants.eta_turboprop()
 
 l_cab = Fuselage(plane).far_25_length()
 plane['fuselage']['length'] = plane['fuselage']['length'] - plane['fuselage']['l_cabin'] + l_cab
@@ -238,6 +302,9 @@ if wing_height == 'low':
     plane['wing']['waterline'] = 0
 else:
     plane['wing']['waterline'] = plane['fuselage']['height']
+
+if tail == 'T':
+    plane['vertical']['taper'] = 0.7
 
 
 dw = 100
@@ -267,7 +334,7 @@ while abs(dw) > 10:
     if tail == 'T':
         plane['horizontal']['waterline'] = plane['vertical']['waterline'] + trapezoidal_wing.span(
             plane['vertical']['aspect_ratio'], plane['vertical']['planform'], mirror=0)
-    else:
+    elif tail == 'conventional':
         plane['horizontal']['waterline'] = plane['vertical']['waterline']
 
     engine_height(plane, requirements)
@@ -279,7 +346,7 @@ while abs(dw) > 10:
         for ii in range(0, plane['propulsion']['n_engines']):
             plane['propulsion']["engine_%d" % (ii + 1)]['station'] = l_cab + plane['fuselage']['l_cockpit'] + 5
 
-    x_ng, x_mg, y_mg, l_g = landing_gear_location(plane)
+    x_ng, x_mg, y_mg, l_g = landing_gear_location(plane, mount=landing_gear)
     plane['landing_gear']['nose'] = [x_ng, 0, -l_g]
     plane['landing_gear']['main'] = [x_mg, y_mg, -l_g]
 
@@ -295,17 +362,15 @@ while abs(dw) > 10:
     plane['wing']['station'] = out[0]
     plane['horizontal']['planform'] = out[1]
     plane['vertical']['planform'] = vertical_tail(plane, requirements, x, u)
+    plane['propulsion']['fuel_mass'] = range_iter(plane, requirements) / g
     plane['weight']['weight'], cg = MassProperties(plane).weight_buildup(requirements)
     dw = w_i - plane['weight']['weight']
 
-plane['horizontal']['control_1']['cf_c'] = elevator(plane, requirements, tol=10e-1)
+plane['horizontal']['control_1']['cf_c'] = elevator(plane, requirements)
+rudder(plane, requirements)
 print_plane(plane)
 a = 1
 # def aileron_sizing():
 #     roll_control
 #     return ca_c, ba_b
 #
-# def rudder_sizing():
-#     vmc
-#     crosswind
-#     return ce_c

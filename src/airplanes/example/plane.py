@@ -5,7 +5,7 @@ plane = {
     'wing': {
         'type': 'wing',
         'planform': 738.7,  # [ft^2]
-        'aspect_ratio': 5,  # []
+        'aspect_ratio': 8,  # []
         'sweep_LE': 0,  # [deg]
         'taper': 0.5,  # []
         'station': 28.43,  # [ft]
@@ -49,7 +49,7 @@ plane = {
         'type': 'wing',
         'planform': 138.2,  # [ft^2]
         'aspect_ratio': 3,  # []
-        'sweep_LE': 20,  # [deg]
+        'sweep_LE': 30,  # [deg]
         'taper': 0.465,  # []
         'station': 73.63,  # [ft]
         'buttline': 0,  # [ft]
@@ -78,7 +78,7 @@ plane = {
         'planform': 33.1,  # [ft^2]
         'aspect_ratio': 3,  # []
         'sweep_LE': 30,  # [deg]
-        'taper': 1,  # []
+        'taper': 0.5,  # []
         'station': 71.63,  # [ft]
         'buttline': 0,  # [ft]
         'waterline': 5.91,  # [ft]
@@ -98,7 +98,7 @@ plane = {
         'height': 8,  # [ft]
         'l_cabin': 43.33,  # [ft]
         'l_cockpit': 5,  # [ft]
-        'pax': 40,
+        'pax': 30,
         'lavatories': 0,
         'seats_row': 2,
     },
@@ -111,13 +111,13 @@ plane = {
         'n_engines': 2,
         'const_mass': 1,
         'fuel_mass': 6000 / 32.2,  # [slug]
-        'energy_density': 12.2 * 2655224 / 0.0685218,  # [ft^2 / s^2]
+        'energy_density': 11.94 * 2655224 / 0.0685218,  # [ft^2 / s^2]
         'total_efficiency': 0.4,
         'engine_1': {
             'type': 'prop',
             'station': 28.4,  # [ft]
             'waterline': 3,  # [ft]
-            'buttline': -12,  # [ft]
+            'buttline': -15,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 6,  # [ft]
@@ -128,7 +128,7 @@ plane = {
             'type': 'prop',
             'station': 28.4,  # [ft]
             'waterline': 3,  # [ft]
-            'buttline': 12,  # [ft]
+            'buttline': 15,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 6,  # [ft]
@@ -158,13 +158,13 @@ requirements = {
         'to_altitude': 5000,  # [ft]
         'cruise_mach': 0.5,  # [ft/s]
         'cruise_altitude': 25000,  # [ft]
-        'range': 500,  # [nm]
+        'range': 825,  # [nm]
     },
     'stability_and_control': {
         'c_n_b': 0.05,  # [1/deg]
-        'sm': 0.05,  # [% mac]
-        'zeta_dr': 0.6,
-        'zeta_sp': 0.6,
+        'sm': 0.03,  # [% mac]
+        'zeta_dr': 0.4,
+        'zeta_sp': 0.4,
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]
         'crosswind': 15,  # [ft/s]

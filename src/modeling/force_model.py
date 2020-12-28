@@ -8,7 +8,7 @@ from src.modeling import Aircraft, Propulsion
 from src.modeling.trapezoidal_wing import mac, span
 
 
-def c_f_m(aircraft, x, u):
+def c_f_m(aircraft, x, u, engine_out=False):
     """return aircraft body axis forces and moments."""
     s = aircraft['wing']['planform']  # [ft2]
     altitude = x[-1]  # [ft]
@@ -22,6 +22,8 @@ def c_f_m(aircraft, x, u):
     c_bar = mac(aircraft['wing']['aspect_ratio'], s, aircraft['wing']['taper'])  # [ft]
     b = span(aircraft['wing']['aspect_ratio'], s)  # [ft]
     throttle = u[3] * ones(aircraft['propulsion']['n_engines'])  # []
+    if engine_out:
+        throttle[0] = 0.01
 
     # get thrust contributions
     c_f_m_t = Propulsion(aircraft['propulsion'], x, throttle, aircraft['weight']['cg']) .thrust_f_m()
