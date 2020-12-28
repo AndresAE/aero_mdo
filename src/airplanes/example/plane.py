@@ -163,7 +163,7 @@ requirements = {
     'stability_and_control': {
         'c_n_b': 0.05,  # [1/deg]
         'sm': 0.03,  # [% mac]
-        'zeta_dr': 0.4,
+        'zeta_dr': 0.6,
         'zeta_sp': 0.4,
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]
