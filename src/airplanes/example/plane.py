@@ -5,7 +5,7 @@ plane = {
     'wing': {
         'type': 'wing',
         'planform': 738.7,  # [ft^2]
-        'aspect_ratio': 8,  # []
+        'aspect_ratio': 6,  # []
         'sweep_LE': 0,  # [deg]
         'taper': 0.5,  # []
         'station': 28.43,  # [ft]
@@ -47,7 +47,7 @@ plane = {
     },
     'horizontal': {
         'type': 'wing',
-        'planform': 138.2,  # [ft^2]
+        'planform': 50,  # [ft^2]
         'aspect_ratio': 3,  # []
         'sweep_LE': 30,  # [deg]
         'taper': 0.465,  # []
@@ -98,7 +98,7 @@ plane = {
         'height': 8,  # [ft]
         'l_cabin': 43.33,  # [ft]
         'l_cockpit': 5,  # [ft]
-        'pax': 30,
+        'pax': 20,
         'lavatories': 0,
         'seats_row': 2,
     },
@@ -161,10 +161,10 @@ requirements = {
         'range': 825,  # [nm]
     },
     'stability_and_control': {
-        'c_n_b': 0.05,  # [1/deg]
+        'c_n_b': 0.08,  # [1/deg]
         'sm': 0.03,  # [% mac]
         'zeta_dr': 0.6,
-        'zeta_sp': 0.4,
+        'zeta_sp': 0.6,
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]
         'crosswind': 15,  # [ft/s]

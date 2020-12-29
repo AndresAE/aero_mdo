@@ -18,6 +18,10 @@ def energy_density_li_ion():
     return 0.22  # [kW.hr/kg]
 
 
+def energy_density_li_s():
+    return 2.6  # [kW.hr/kg]
+
+
 def eta_electric():
     return 0.7  # []
 
