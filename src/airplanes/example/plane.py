@@ -99,7 +99,7 @@ plane = {
         'l_cabin': 43.33,  # [ft]
         'l_cockpit': 5,  # [ft]
         'pax': 20,
-        'lavatories': 0,
+        'lavatories': 1,
         'seats_row': 2,
     },
     'weight': {

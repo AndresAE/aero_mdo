@@ -64,7 +64,7 @@ class Fuselage:
         else:
             n_exits = max([2, n_exit_l])
             l_exits = n_exits * constants.type_1_exit_width()
-        l_fus = l_exits + l_row
+        l_fus = l_exits + l_row + fus['lavatories'] * constants.lav_length()
         return l_fus
 
     def parasite_drag_fuselage(self, mach, altitude):
