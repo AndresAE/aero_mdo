@@ -109,7 +109,7 @@ def longitudinal_sizing(plane, req, s, u, tol=10e-1):
     zeta_req = req['stability_and_control']['zeta_sp']
     sm_req = req['stability_and_control']['sm']*100
 
-    de = deg2rad(plane['horizontal']['control_1']['limits'][0])
+    de = deg2rad(plane['horizontal']['control_1']['limits'][0])*0.75
     u_r = [0, de, 0, 0.01]
     vr = req['performance']['stall_speed'] * 1.15
     alt_to = req['performance']['to_altitude']

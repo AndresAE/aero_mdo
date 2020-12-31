@@ -4,11 +4,11 @@ plane = {
     'type': 'transport',
     'wing': {
         'type': 'wing',
-        'planform': 468.6,  # [ft^2]
-        'aspect_ratio': 8,  # []
+        'planform': 449.19,  # [ft^2]
+        'aspect_ratio': 12,  # []
         'sweep_LE': 0,  # [deg]
         'taper': 0.5,  # []
-        'station': 26.8,  # [ft]
+        'station': 26.3,  # [ft]
         'buttline': 0,  # [ft]
         'waterline': 7.9,  # [ft]
         'incidence': 0,  # [deg]
@@ -75,7 +75,7 @@ plane = {
     },
     'vertical': {
         'type': 'vertical',
-        'planform': 32.6,  # [ft^2]
+        'planform': 18.9,  # [ft^2]
         'aspect_ratio': 3,  # []
         'sweep_LE': 30,  # [deg]
         'taper': 0.5,  # []
@@ -103,9 +103,9 @@ plane = {
         'seats_row': 2,
     },
     'weight': {
-        'weight': 15062,  # [lb]
-        'inertia': [[39477, 0, 13160], [0, 42234, 0], [13160, 0, 72611]],  # [slug*ft^2]
-        'cg': [29.3, 0, 5.5]  # [ft]
+        'weight': 15309,  # [lb]
+        'inertia': [[57700, 0, 19233], [0, 42930, 0], [19233, 0, 88965]],  # [slug*ft^2]
+        'cg': [28.9, 0, 5.6]  # [ft]
     },
     'propulsion': {
         'n_engines': 2,
@@ -117,7 +117,7 @@ plane = {
             'type': 'prop',
             'station': 26.9,  # [ft]
             'waterline': 6,  # [ft]
-            'buttline': -10,  # [ft]
+            'buttline': -12,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 4.75,  # [ft]
@@ -128,7 +128,7 @@ plane = {
             'type': 'prop',
             'station': 26.9,  # [ft]
             'waterline': 6,  # [ft]
-            'buttline': 10,  # [ft]
+            'buttline': 12,  # [ft]
             'thrust_angle': 0,  # [deg]
             'toe_angle': 0,  # [deg]
             'diameter': 4.75,  # [ft]
@@ -137,10 +137,10 @@ plane = {
         },
     },
     'landing_gear': {
-        'nose': [7.45, 0, -1.6],  # [ft]
+        'nose': [6.95, 0, -1.6],  # [ft]
         'nose_diameter': 1,  # [ft]
         'nose_width': 0.5,  # [ft]
-        'main': [30.87, 3, -1.6],  # [ft], left (mirrored on the right)
+        'main': [30.65, 3, -1.6],  # [ft], left (mirrored on the right)
         'main_diameter': 1.5,  # [ft]
         'main_width': 1.5,  # [ft]
         'mu_roll': 0.02,
@@ -161,10 +161,10 @@ requirements = {
         'range': 825,  # [nm]
     },
     'stability_and_control': {
-        'c_n_b': 0.1,  # [1/deg]
-        'sm': 0.1,  # [% mac]
-        'zeta_dr': 0.6,
-        'zeta_sp': 0.6,
+        'c_n_b': 0.05,  # [1/deg]
+        'sm': 0.03,  # [% mac]
+        'zeta_dr': 0.4,
+        'zeta_sp': 0.4,
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]
         'crosswind': 15,  # [ft/s]

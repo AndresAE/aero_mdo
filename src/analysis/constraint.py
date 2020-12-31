@@ -33,14 +33,13 @@ def stall_speed(mach, altitude, c_l_max, n, gamma):
     return w_s
 
 
-def takeoff(aircraft, wing_loading, s_to, altitude, mu):
+def takeoff(aircraft, wing_loading, s_to, altitude, mu, c_l_max=1.4):
     """takeoff constraint equation."""
     "return sea level static thrust to weight ratio"
     g = Earth(0).gravity()
     rho = Atmosphere(altitude).air_density()
     rho_sl = Atmosphere(0).air_density()
 
-    c_l_max = 1
     a = Atmosphere(altitude).speed_of_sound()
     q_stall = wing_loading / c_l_max
     q_v_avg = 0.5 * q_stall
