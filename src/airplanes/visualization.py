@@ -60,7 +60,7 @@ def print_wing(wing):
     c_t = c_r * wing['taper']
     x = wing['station'] + array([0, b/2*tan(deg2rad(wing['sweep_LE'])), b/2*tan(deg2rad(wing['sweep_LE'])) + c_t,
                                  c_r, b/2*tan(deg2rad(wing['sweep_LE'])) + c_t, b/2*tan(deg2rad(wing['sweep_LE'])), 0])
-    y = array([0, b, b, 0, -b, -b, 0])
+    y = array([0, b/2, b/2, 0, -b/2, -b/2, 0])
     z = wing['waterline'] + array([0, b/2*tan(deg2rad(wing['dihedral'])), b/2*tan(deg2rad(wing['dihedral'])), 0,
                                    b / 2 * tan(deg2rad(wing['dihedral'])), b/2*tan(deg2rad(wing['dihedral'])), 0])
     return x, y, z

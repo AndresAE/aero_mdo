@@ -198,7 +198,6 @@ def range_iter(plane, req):
 
 
 def rudder(plane, req, tol=10e-1):
-    alt = req['flight_envelope']['altitude'][1]
     alpha = plane['wing']['alpha_stall'] + 2
     dr = deg2rad(plane['vertical']['control_1']['limits'][0])
 
@@ -289,7 +288,8 @@ def wing_location(plane, requirements, v, altitude, tol=10e-4):
 
 
 def design(plane, requirements,
-           wing_height='high', tail='conventional', engine='wing_mounted', landing_gear='fuselage', propulsion='h2'):
+           wing_height='high', tail='conventional', engine='wing_mounted', landing_gear='fuselage',
+           propulsion='h2'):
 
     if propulsion == 'h2':
         plane['propulsion']['energy_density'] = constants.energy_density_h2() * 2655224 / 0.0685218

@@ -63,7 +63,7 @@ def balanced_field_length(aircraft, x_0, u_0, rotate_margin=1, h_f=35):
     x_rto = x
 
     while pitch[-1] < aircraft['wing']['alpha_stall'] - rotate_margin:
-        u_0[1] = -2*((aircraft['wing']['alpha_stall'] - 2) - pitch[-1])*pi/180
+        u_0[1] = aircraft['horizontal']['control_1']['limits'][0]
         dxdt = takeoff_ground_roll(aircraft, x, u_0)
         p = p + x * dt + 0.5 * dxdt * dt ** 2
         x = x + dxdt * dt

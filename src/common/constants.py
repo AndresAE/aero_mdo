@@ -89,6 +89,7 @@ def kg2slug():
 def lav_length():
     return 2  # [ft]
 
+
 def lbft_s2hp():
     return 1 / 550
 

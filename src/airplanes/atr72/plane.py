@@ -98,9 +98,9 @@ plane = {
         'height': 7.91,  # [ft]
         'l_cabin': 30,  # [ft]
         'l_cockpit': 5,  # [ft]
-        'pax': 20,
-        'lavatories': 0,
-        'seats_row': 2,
+        'pax': 70,
+        'lavatories': 1,
+        'seats_row': 4,
     },
     'weight': {
         'weight': 15062,  # [lb]
@@ -162,7 +162,7 @@ requirements = {
     },
     'stability_and_control': {
         'c_n_b': 0.1,  # [1/deg]
-        'sm': 0.1,  # [% mac]
+        'sm': 0.15,  # [% mac]
         'zeta_dr': 0.6,
         'zeta_sp': 0.6,
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
