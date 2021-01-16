@@ -1,13 +1,13 @@
 from numpy import cos, deg2rad, mean, sin, sqrt
 from common import Atmosphere
-from common.Earth import Earth
+from common.Gravity import Gravity
 from src.modeling.Aircraft import Aircraft
+g = Gravity(0).gravity()
 
 
 def master_constraint(aircraft, wing_loading, mach, altitude, n, gamma, a_x):
     """master constraint equation for flight."""
     "return sea level static thrust to weight ratio"
-    g = Earth(0).gravity()
     rho = Atmosphere(altitude).air_density()
     rho_sl = Atmosphere(0).air_density()
     a = Atmosphere(altitude).speed_of_sound()
@@ -36,7 +36,6 @@ def stall_speed(mach, altitude, c_l_max, n, gamma):
 def takeoff(aircraft, wing_loading, s_to, altitude, mu, c_l_max=1.4):
     """takeoff constraint equation."""
     "return sea level static thrust to weight ratio"
-    g = Earth(0).gravity()
     rho = Atmosphere(altitude).air_density()
     rho_sl = Atmosphere(0).air_density()
 
