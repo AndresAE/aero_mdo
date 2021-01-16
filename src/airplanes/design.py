@@ -390,6 +390,6 @@ def design(plane, requirements,
         dw = w_i - plane['weight']['weight']
 
     plane['horizontal']['control_1']['cf_c'] = elevator(plane, requirements)
-    rudder(plane, requirements)
+    plane['vertical']['control_1']['cf_c'] = rudder(plane, requirements)
     print_plane(plane)
     return plane

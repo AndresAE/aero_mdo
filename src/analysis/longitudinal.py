@@ -1,11 +1,13 @@
 from control import damp, StateSpace
 from matplotlib import pyplot as plt
-from numpy import append, array, cos, flip, floor, gradient, linspace, log, max, mean, min, unique, pi, sin, sort, \
-    sqrt, sum, zeros
+from numpy import append, array, cos, deg2rad, flip, floor, gradient, linspace, log, max, mean, min, unique, pi, sin, \
+    sort, sqrt, sum, zeros
 from scipy.interpolate import InterpolatedUnivariateSpline
-from src.analysis.trim import trim_alpha_de_throttle, trim_vr, trim_vs, trim_vs_nonlinear
+from src.analysis.trim import trim_alpha_de_nonlinear, trim_alpha_de_throttle, trim_vr, trim_vs, trim_vs_nonlinear
 from src.common import Atmosphere, Earth
 from src.common.equations_of_motion import nonlinear_eom, nonlinear_eom_to_ss
+from src.common.report_tools import load_aero_model, model_exists
+from src.common.tools import uvw
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import c_f_m, landing_gear_loads, linear_aero, nonlinear_aero
 g = Earth(0).gravity()  # f/s2
@@ -140,6 +142,25 @@ def long_modes(aircraft, x_0, u_0):
     wn_ph = unique(min(wn))
     zeta_ph = unique(zeta[wn == wn_ph])
     return wn_sp, zeta_sp, wn_ph, zeta_ph
+
+
+def l_d_analysis(plane):
+    if model_exists(plane['name']):
+        plane['aero_model'] = load_aero_model(plane['name'])
+
+    cg = plane['weight']['cg'][0] * array([1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3])
+    l_d = []
+    de = []
+    aoa = []
+    for ii in cg:
+        plane['weight']['cg'][0] = ii
+        c = trim_alpha_de_nonlinear(plane, 300, 15000, 0)
+        v = uvw(300, c[0], 0)
+        cfm = nonlinear_aero(plane, [v[0], v[1], v[2], 0, deg2rad(c[0]), 0, 0, 0, 0, 0, 0, 15000], [0, deg2rad(c[1]), 0, 0])
+        de.append(c[1])
+        aoa.append(c[0])
+        l_d.append(cfm[2] / cfm[0])
+    return
 
 
 def l_over_d(aircraft, mach, altitude):

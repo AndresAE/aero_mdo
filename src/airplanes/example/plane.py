@@ -49,7 +49,7 @@ plane = {
         'type': 'wing',
         'planform': 39.2,  # [ft^2]
         'aspect_ratio': 3,  # []
-        'sweep_LE': 25,  # [deg]
+        'sweep_LE': 30,  # [deg]
         'taper': 0.465,  # []
         'station': 60.3,  # [ft]
         'buttline': 0,  # [ft]
@@ -98,7 +98,7 @@ plane = {
         'height': 7.91,  # [ft]
         'l_cabin': 30,  # [ft]
         'l_cockpit': 5,  # [ft]
-        'pax': 20,
+        'pax': 30,
         'lavatories': 0,
         'seats_row': 2,
     },
@@ -161,9 +161,9 @@ requirements = {
         'range': 825,  # [nm]
     },
     'stability_and_control': {
-        'c_n_b': 0.05,  # [1/deg]
+        'c_n_b': 0.12,  # [1/deg]
         'sm': 0.03,  # [% mac]
-        'zeta_dr': 0.4,
+        'zeta_dr': 0.6,
         'zeta_sp': 0.4,
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]
