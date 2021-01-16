@@ -1,7 +1,7 @@
 """Returns force and moment coefficients for fuselages."""
 from numpy import array, ceil, pi
 from scipy.optimize import minimize
-from src.common import constants
+from common import constants
 from src.modeling.aerodynamics import friction_coefficient, pressure_drag
 
 

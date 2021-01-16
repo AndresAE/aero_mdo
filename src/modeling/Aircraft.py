@@ -1,6 +1,6 @@
 """Returns force and moment coefficients for total aircraft, empirical methods."""
 from numpy import array, cos, deg2rad, interp, pi, sin, tan
-from src.common.rotations import ned_to_body
+from common.rotations import ned_to_body
 from src.modeling.flap import c_f_m_flap
 from src.modeling.Fuselage import Fuselage
 from src.modeling.LiftingSurface import LiftingSurface

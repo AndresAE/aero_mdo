@@ -1,4 +1,4 @@
-from src.common import constants
+from common import constants
 r_0 = 6378137  # [m]
 gravitational_const = 6.67408 * 10 ** (-11)
 m_earth = 5.9728 * 10 ** 24  # [kg]

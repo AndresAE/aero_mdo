@@ -1,4 +1,4 @@
-from src.common.rotations import angular_rate_rotation, body_to_wind, eci_to_ned, ned_to_body
+from common.rotations import angular_rate_rotation, body_to_wind, eci_to_ned, ned_to_body
 from numpy import pi
 from test.test_library import is_close
 

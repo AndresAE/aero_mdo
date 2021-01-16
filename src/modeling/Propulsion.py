@@ -1,5 +1,5 @@
 from numpy import array, cos as c, cross, deg2rad, sin as s, sum, zeros
-from src.common import Atmosphere
+from common import Atmosphere
 from scipy.interpolate import RectBivariateSpline
 
 

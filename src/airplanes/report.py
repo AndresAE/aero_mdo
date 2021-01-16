@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 from numpy import arctan, array, cos, deg2rad, linspace, sin, zeros
-from src.common import Atmosphere, Earth
-from src.common.report_tools import create_output_dir, load_aero_model, model_exists, plot_or_save
+from common import Atmosphere, Earth
+from common.report_tools import create_output_dir, load_aero_model, model_exists, plot_or_save
 from src.analysis.lateral_directional import dutch_roll_mode, latdir_stability_nonlinear, plot_dr, roll_mode, \
     spiral_mode
 from src.analysis.longitudinal import aircraft_range, balanced_field_length, maneuvering, maneuvering_envelope, \

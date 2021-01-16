@@ -1,6 +1,6 @@
 # File containing Equations of Motion
 from numpy import concatenate, cross, dot, identity, linalg, transpose, zeros
-from src.common.rotations import angular_rate_rotation, ned_to_body
+from common.rotations import angular_rate_rotation, ned_to_body
 from src.modeling.force_model import c_f_m
 
 

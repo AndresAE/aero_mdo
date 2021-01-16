@@ -1,9 +1,9 @@
 """Trim aircraft longitudinally."""
 from numpy import arcsin, array, cos, deg2rad, linalg, ones, rad2deg, sin, sqrt
 from scipy.optimize import minimize, Bounds
-from src.common import Atmosphere
-from src.common import Earth
-from src.common.rotations import body_to_wind
+from common import Atmosphere
+from common import Earth
+from common.rotations import body_to_wind
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import c_f_m, landing_gear_loads
 from src.modeling.trapezoidal_wing import mac, span

@@ -1,8 +1,8 @@
 # """real time state-space simulator attempt, try building code in azure."""
 # from src.airplanes.example.plane import plane
-# from src.common import Earth
+# from common import Earth
 # from control import StateSpace
-# from src.common.equations_of_motion import nonlinear_eom_to_ss
+# from common.equations_of_motion import nonlinear_eom_to_ss
 # from src.analysis.trim import trim_alpha_de
 # import matplotlib.pyplot as plt
 # from numpy import array, zeros, deg2rad, cos, sin, pi

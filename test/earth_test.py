@@ -1,4 +1,4 @@
-from src.common import Earth
+from common import Earth
 from test.test_library import is_close
 
 h_0 = Earth(0)

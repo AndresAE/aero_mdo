@@ -1,4 +1,4 @@
-from src.common import Atmosphere
+from common import Atmosphere
 from test.test_library import is_close
 
 h_0 = Atmosphere(0)

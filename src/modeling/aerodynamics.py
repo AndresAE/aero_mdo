@@ -1,8 +1,8 @@
 """Contains aerodynamic calculations."""
 import avlwrapper as avl
 from numpy import array, concatenate, deg2rad, linspace, log10, pi, sort, sqrt, tan, unique, zeros
-from src.common import Atmosphere
-from src.common.report_tools import save_aero_model
+from common import Atmosphere
+from common.report_tools import save_aero_model
 from src.modeling.trapezoidal_wing import mac, root_chord, span, sweep_x, y_chord
 
 

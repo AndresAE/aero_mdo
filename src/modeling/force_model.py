@@ -1,9 +1,9 @@
 from numpy import array, arctan, cos, linalg, ones, sin, sqrt, rad2deg
 from scipy.interpolate import interp2d
-from src.common.rotations import body_to_wind, translate_mrc
+from common.rotations import body_to_wind, translate_mrc
 from src.modeling.aerodynamics import dynamic_pressure
-from src.common import Atmosphere
-from src.common.report_tools import load_aero_model, model_exists
+from common import Atmosphere
+from common.report_tools import load_aero_model, model_exists
 from src.modeling import Aircraft, Propulsion
 from src.modeling.trapezoidal_wing import mac, span
 

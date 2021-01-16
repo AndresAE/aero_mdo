@@ -1,6 +1,6 @@
 from numpy import cos, deg2rad, mean, sin, sqrt
-from src.common import Atmosphere
-from src.common.Earth import Earth
+from common import Atmosphere
+from common.Earth import Earth
 from src.modeling.Aircraft import Aircraft
 
 

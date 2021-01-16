@@ -2,9 +2,9 @@ from control import damp, StateSpace
 from matplotlib import pyplot as plt
 from numpy import array, gradient, linalg, log, max, mean, min, unique, real
 from src.analysis.trim import trim_aileron_rudder_speed_nonlinear
-from src.common import Earth, Atmosphere
-from src.common.equations_of_motion import nonlinear_eom_to_ss
-from src.common.rotations import body_to_wind
+from common import Earth, Atmosphere
+from common.equations_of_motion import nonlinear_eom_to_ss
+from common.rotations import body_to_wind
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import linear_aero, nonlinear_aero
 g = Earth(0).gravity()  # f/s2
