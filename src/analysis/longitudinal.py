@@ -149,18 +149,23 @@ def l_d_analysis(plane):
     if model_exists(plane['name']):
         plane['aero_model'] = load_aero_model(plane['name'])
 
-    cg = plane['weight']['cg'][0] * array([1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3])
+    cg = plane['weight']['cg'][0] * array([1, 1.03, 1.06, 1.09, 1.12])
+    altitude = 15000
+    speed = 300
+    a = Atmosphere(15000).speed_of_sound()
     l_d = []
     de = []
     aoa = []
+    sm = []
     for ii in cg:
         plane['weight']['cg'][0] = ii
-        c = trim_alpha_de_nonlinear(plane, 300, 15000, 0)
-        v = uvw(300, c[0], 0)
-        cfm = nonlinear_aero(plane, [v[0], v[1], v[2], 0, deg2rad(c[0]), 0, 0, 0, 0, 0, 0, 15000], [0, deg2rad(c[1]), 0, 0])
+        c = trim_alpha_de_nonlinear(plane, speed, altitude, 0)
+        v = uvw(speed, c[0], 0)
+        cfm = nonlinear_aero(plane, [v[0], v[1], v[2], 0, deg2rad(c[0]), 0, 0, 0, 0, 0, 0, altitude], [0, deg2rad(c[1]), 0, 0])
         de.append(c[1])
         aoa.append(c[0])
         l_d.append(cfm[2] / cfm[0])
+        sm.append(static_margin_nonlinear(plane, speed / a, altitude, deg2rad(c[0]), deg2rad(c[1])))
     return
 
 
