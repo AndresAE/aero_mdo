@@ -1,6 +1,6 @@
 # """real time state-space simulator attempt, try building code in azure."""
 # from src.airplanes.example.plane import plane
-# from common import Earth
+# from common import Gravity
 # from control import StateSpace
 # from common.equations_of_motion import nonlinear_eom_to_ss
 # from src.analysis.trim import trim_alpha_de
@@ -14,7 +14,7 @@
 #
 # aircraft = plane
 # altitude = 30000  # ft
-# g = Earth(altitude).gravity()  # f/s2
+# g = Gravity(altitude).gravity()  # f/s2
 # v = 500  # ft/s
 # dt = 0.01  # s
 # throttle = 1

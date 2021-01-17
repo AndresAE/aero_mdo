@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 from numpy import arctan, array, cos, deg2rad, linspace, sin, zeros
-from common import Atmosphere, Earth
+from common import Atmosphere, Gravity
 from common.report_tools import create_output_dir, load_aero_model, model_exists, plot_or_save
 from src.analysis.lateral_directional import dutch_roll_mode, latdir_stability_nonlinear, plot_dr, roll_mode, \
     spiral_mode
@@ -8,7 +8,7 @@ from src.analysis.longitudinal import aircraft_range, balanced_field_length, man
     plot_sp, short_period_mode, specific_excess_power, static_margin_nonlinear
 from src.analysis.trim import trim_aileron_nonlinear, trim_aileron_rudder_nonlinear, trim_alpha_de_nonlinear, trim_vx, \
     trim_vy
-g = Earth(0).gravity()  # f/s2
+g = Gravity(0).gravity()  # f/s2
 show_plot = 0
 save_plot = 1
 

@@ -4,13 +4,14 @@ from numpy import append, array, cos, deg2rad, flip, floor, gradient, linspace, 
     sort, sqrt, sum, zeros
 from scipy.interpolate import InterpolatedUnivariateSpline
 from src.analysis.trim import trim_alpha_de_nonlinear, trim_alpha_de_throttle, trim_vr, trim_vs, trim_vs_nonlinear
-from common import Atmosphere, Earth
-from common.equations_of_motion import nonlinear_eom, nonlinear_eom_to_ss
+from common import Atmosphere, Gravity
+from common.equations_of_motion import nonlinear_eom
 from common.report_tools import load_aero_model, model_exists
 from common.tools import uvw
+from src.analysis.controls_analysis import nonlinear_eom_to_ss
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import c_f_m, landing_gear_loads, linear_aero, nonlinear_aero
-g = Earth(0).gravity()  # f/s2
+g = Gravity(0).gravity()  # f/s2
 
 
 def aircraft_range(aircraft, x, u):

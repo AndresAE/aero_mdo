@@ -2,7 +2,7 @@
 from numpy import arcsin, array, cos, deg2rad, linalg, ones, rad2deg, sin, sqrt
 from scipy.optimize import minimize, Bounds
 from common import Atmosphere
-from common import Earth
+from common import Gravity
 from common.rotations import body_to_wind
 from src.modeling.Aircraft import Aircraft
 from src.modeling.force_model import c_f_m, landing_gear_loads
@@ -221,7 +221,7 @@ def trim_alpha_de_nonlinear(aircraft, speed, altitude, gamma, n=1, tol=1e-1):
 def trim_vfs(aircraft, altitude, tol=1e-1):
     """trim nonlinear aircraft to best rate of climb."""
     th = 1
-    g = Earth(altitude).gravity()
+    g = Gravity(altitude).gravity()
 
     def obj(x):
         u = array([0, x[1], 0, th])

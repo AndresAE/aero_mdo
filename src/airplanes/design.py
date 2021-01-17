@@ -7,11 +7,11 @@ from src.analysis.constraint import takeoff, master_constraint, stall_speed
 from src.analysis.longitudinal import short_period_mode, static_margin
 from src.analysis.lateral_directional import directional_stability, dutch_roll_mode
 from src.analysis.trim import trim_alpha_de_nonlinear
-from common import Atmosphere, Earth, constants
+from common import Atmosphere, Gravity, constants
 from src.modeling.aerodynamics import polhamus
 from src.modeling import Aircraft, Fuselage, MassProperties, Propulsion, trapezoidal_wing
 from src.modeling.force_model import c_f_m, landing_gear_loads
-g = Earth(0).gravity()
+g = Gravity(0).gravity()
 
 
 def dihedral(plane, req):

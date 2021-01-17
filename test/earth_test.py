@@ -1,8 +1,8 @@
-from common import Earth
+from common import Gravity
 from test.test_library import is_close
 
-h_0 = Earth(0)
-h_40k = Earth(40000)
+h_0 = Gravity(0)
+h_40k = Gravity(40000)
 
 out = list()
 out.append((is_close(h_0.gravity(), 32.14894)))

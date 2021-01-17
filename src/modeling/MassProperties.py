@@ -1,10 +1,10 @@
 from matplotlib import pyplot as plt
 from numpy import array, ceil, cos, deg2rad, pi
-from common import Atmosphere, Earth, constants
+from common import Atmosphere, Gravity, constants
 from src.modeling import LiftingSurface
 from src.modeling.Propulsion import propeller
 from src.modeling.trapezoidal_wing import span, sweep_x
-g = Earth(0).gravity()  # [f/s2]
+g = Gravity(0).gravity()  # [f/s2]
 
 
 class MassProperties:
