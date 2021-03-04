@@ -149,7 +149,7 @@ def l_d_analysis(plane):
     if model_exists(plane['name']):
         plane['aero_model'] = load_aero_model(plane['name'])
 
-    cg = plane['weight']['cg'][0] * array([1, 1.03, 1.06, 1.09, 1.12])
+    cg = plane['weight']['cg'][0] * array([1, 1.03, 1.06, 1.09, 1.12, 1.15, 1.18, 1.21])
     altitude = 15000
     speed = 300
     a = Atmosphere(15000).speed_of_sound()

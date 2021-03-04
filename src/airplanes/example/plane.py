@@ -60,14 +60,14 @@ plane = {
         'n_controls': 2,
         'control_1': {
             'name': 'elevator_l',
-            'limits': [-25, 15],  # [deg]
+            'limits': [-25, 25],  # [deg]
             'cf_c': 1,
             'b_1': -1,
             'b_2': 0.1,
         },
         'control_2': {
             'name': 'elevator_r',
-            'limits': [-25, 15],  # [deg]
+            'limits': [-25, 25],  # [deg]
             'cf_c': 1,
             'b_1': 0.1,
             'b_2': 1,
@@ -93,14 +93,14 @@ plane = {
         },
     },
     'fuselage': {
-        'length': 63.3,  # [ft]
+        'length': 60,  # [ft]
         'width': 5.95,  # [ft]
         'height': 7.91,  # [ft]
         'l_cabin': 30,  # [ft]
         'l_cockpit': 5,  # [ft]
-        'pax': 30,
+        'pax': 8,
         'lavatories': 0,
-        'seats_row': 2,
+        'seats_row': 1,
     },
     'weight': {
         'weight': 15309,  # [lb]
@@ -161,9 +161,9 @@ requirements = {
         'range': 825,  # [nm]
     },
     'stability_and_control': {
-        'c_n_b': 0.12,  # [1/deg]
+        'c_n_b': 0.1,  # [1/deg]
         'sm': 0.03,  # [% mac]
-        'zeta_dr': 0.6,
+        'zeta_dr': 0.4,
         'zeta_sp': 0.4,
         'roll_rate': 30 / 1.5,  # [seconds] to 30 deg of roll
         'rotation_margin': 1,  # [deg]

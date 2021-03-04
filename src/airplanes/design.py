@@ -83,7 +83,7 @@ def engine_height(plane, req):
     return
 
 
-def landing_gear_location(plane, k=0.07, mount='fuselage'):
+def landing_gear_location(plane, k=0.05, mount='fuselage'):
     """return landing gear coordinates."""
     theta = deg2rad(plane['wing']['alpha_stall'] + 1)
     x_cg = plane['weight']['cg'][0]
